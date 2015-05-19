@@ -1,0 +1,9 @@
+app:
+    ui:
+        title: Cash Management System
+        
+    fxmlPath:
+        login: design/Login.xml
+
+server:
+    port: 8080

@@ -12,13 +12,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.surpassun.cash.config.ScreensConfiguration;
+import com.surpassun.cash.config.ScreenConfiguration;
 
 public class LoginController implements DialogController {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	private ScreensConfiguration screens;
+	private ScreenConfiguration screens;
 	private FXMLDialog dialog;
 
 	@Override
@@ -26,7 +26,7 @@ public class LoginController implements DialogController {
 		this.dialog = dialog;
 	}
 
-	public LoginController(ScreensConfiguration screens) {
+	public LoginController(ScreenConfiguration screens) {
 		this.screens = screens;
 	}
 

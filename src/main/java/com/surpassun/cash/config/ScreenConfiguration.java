@@ -9,16 +9,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.ClassPathResource;
 
 import com.surpassun.cash.fx.controller.FXMLDialog;
 import com.surpassun.cash.fx.controller.LoginController;
 
 @Configuration
 @Lazy
-public class ScreensConfiguration {
+public class ScreenConfiguration {
 
     private Stage primaryStage;
-
+    
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
@@ -30,13 +31,13 @@ public class ScreensConfiguration {
     
     @Bean
     @Scope("prototype")
-    FXMLDialog loginDialog() {
-        return new FXMLDialog(loginController(), getClass().getResource("Login.fxml"), primaryStage, StageStyle.UNDECORATED);
+    public FXMLDialog loginDialog() {
+    	return new FXMLDialog(loginController(), new ClassPathResource("design/Login.fxml"), primaryStage, StageStyle.UNDECORATED);
     }
 
     @Bean
     @Scope("prototype")
-    LoginController loginController() {
+    public LoginController loginController() {
         return new LoginController(this);
     }
 }
