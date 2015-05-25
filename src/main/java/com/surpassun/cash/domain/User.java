@@ -1,12 +1,18 @@
 package com.surpassun.cash.domain;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A user.
@@ -27,6 +33,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @NotNull
     private Boolean activated = false;
+    
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "T_USER_AUTHORITY",
+            joinColumns = {@JoinColumn(name = "login", referencedColumnName = "login")},
+            inverseJoinColumns = {@JoinColumn(name = "name", referencedColumnName = "name")})
+    private Set<Authority> authorities;
 
     public String getLogin() {
         return login;
@@ -50,6 +64,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setActivated(Boolean activated) {
         this.activated = activated;
+    }
+    
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override

@@ -19,7 +19,7 @@ spring:
         show_sql: true
         generate-ddl: false
         hibernate:
-            ddl-auto: none
+            ddl-auto: create-drop
             naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
         properties:
             hibernate.cache.use_second_level_cache: true
@@ -29,11 +29,6 @@ spring:
 
     mail:
         baseUrl: http://localhost:8080
-
-    thymeleaf:
-        mode: XHTML
-        cache: false
-        viewNames: error
 
 metrics:
     jmx.enabled: true

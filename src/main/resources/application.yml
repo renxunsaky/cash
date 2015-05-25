@@ -7,3 +7,7 @@ app:
 
 server:
     port: 8080
+
+locale:
+    language: fr
+    country: FR

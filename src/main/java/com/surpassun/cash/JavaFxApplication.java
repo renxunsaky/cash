@@ -12,7 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 import com.surpassun.cash.config.Constants;
-import com.surpassun.cash.config.ScreenConfiguration;
+import com.surpassun.cash.config.ScreenManager;
+import com.surpassun.cash.fx.controller.SimpleController;
 
 @SpringBootApplication
 public class JavaFxApplication extends Application {
@@ -20,11 +21,14 @@ public class JavaFxApplication extends Application {
 	private ConfigurableApplicationContext applicationContext;
 	private static String[] args;
 
-	@Value("${app.ui.title:Example App}")
+	@Value("${app.ui.title}")
 	private String windowTitle;
 	
 	@Inject
-	ScreenConfiguration screenConfiguration;
+	ScreenManager screenManager;
+	
+	@Inject
+	SimpleController simpleController;
 	
 	@Override
 	public void init() throws Exception {
@@ -54,12 +58,11 @@ public class JavaFxApplication extends Application {
 	public void start(Stage stage) throws Exception {
 		stage.setTitle(windowTitle);
 		stage.setResizable(true);
-		stage.setFullScreen(true);
+		//stage.setFullScreen(true);
 		stage.centerOnScreen();
-		screenConfiguration.setPrimaryStage(stage);
-		stage.setScene(screenConfiguration.loginDialog().getScene());
+		screenManager.setPrimaryStage(stage);
+		screenManager.showLogin();
 		stage.show();
-//		screenConfiguration.loginDialog().show();
 	}
 	
 	@Override

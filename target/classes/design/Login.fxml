@@ -5,18 +5,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.surpassun.cash.fx.controller.LoginController">
    <children>
-      <PasswordField layoutX="300.0" layoutY="253.0" />
-      <Button layoutX="248.0" layoutY="313.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="112.0" text="Login" />
-      <TextField layoutX="300.0" layoutY="194.0" />
-      <Label layoutX="160.0" layoutY="199.0" text="Identifiant" />
-      <Label layoutX="160.0" layoutY="258.0" text="Mot de passe" />
+      <Label layoutX="160.0" layoutY="199.0" text="%ui.label.username" />
+      <Label layoutX="160.0" layoutY="258.0" text="%ui.label.password" />
       <Label alignment="CENTER" layoutX="136.0" layoutY="71.0" prefHeight="73.0" prefWidth="359.0" text="Cash Management System" textAlignment="CENTER" textFill="#460db9">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
+      <TextField fx:id="username" layoutX="300.0" layoutY="194.0" />
+      <PasswordField fx:id="password" layoutX="300.0" layoutY="253.0" />
+      <Button layoutX="248.0" layoutY="313.0" mnemonicParsing="false" onAction="#login" onTouchReleased="#login" prefHeight="26.0" prefWidth="112.0" text="%ui.button.login" />
    </children>
 </AnchorPane>

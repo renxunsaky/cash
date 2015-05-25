@@ -1,0 +1,7 @@
+.ImageView {
+	-fx-cursor: pointer;
+}
+
+.ImageView:hover {
+	-fx-border-color: #787878;
+}

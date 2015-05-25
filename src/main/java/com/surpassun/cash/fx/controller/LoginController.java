@@ -1,56 +1,48 @@
 package com.surpassun.cash.fx.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
-import com.surpassun.cash.config.ScreenConfiguration;
+import com.surpassun.cash.config.Constants;
+import com.surpassun.cash.config.ScreenManager;
 
-public class LoginController implements DialogController {
-
-	@Autowired
+@Component
+public class LoginController extends SimpleController {
+	
+	@Inject
 	private AuthenticationManager authenticationManager;
-	private ScreenConfiguration screens;
-	private FXMLDialog dialog;
-
-	@Override
-	public void setDialog(FXMLDialog dialog) {
-		this.dialog = dialog;
-	}
-
-	public LoginController(ScreenConfiguration screens) {
-		this.screens = screens;
-	}
-
-	@FXML
-	Label header;
+	
+	@Inject
+	private ScreenManager screenManager;
+	
 	@FXML
 	TextField username;
 	@FXML
 	TextField password;
+	
+	public void show(Stage stage) {
+		super.show(this, stage, Constants.FXML_DESIGN_LOGIN);
+	}
 
 	@FXML
 	public void login() {
-		Authentication authToken = new UsernamePasswordAuthenticationToken(
-				username.getText(), password.getText());
 		try {
-			authToken = authenticationManager.authenticate(authToken);
-			SecurityContextHolder.getContext().setAuthentication(authToken);
+			Authentication auth = new UsernamePasswordAuthenticationToken(username.getText(), password.getText());
+			SecurityContextHolder.getContext().setAuthentication(authenticationManager.authenticate(auth));
 		} catch (AuthenticationException e) {
-			header.setText("Login failure, please try again:");
-			header.setTextFill(Color.DARKRED);
 			return;
 		}
-		dialog.close();
-		//TODO : show next screen
-		//screens.showScreen(screens.customerDataScreen());
+		
+		screenManager.showMainScreen();
 	}
 }
