@@ -14,6 +14,7 @@ public interface Constants {
     
     public static final String FXML_DESIGN_LOGIN = FXML_DESIGN_PREFIX + "Login" + FXML_DESIGN_SUFIX;
 	public static final String FXML_DESIGN_MAIN = FXML_DESIGN_PREFIX + "Main" + FXML_DESIGN_SUFIX;
+	public static final String FXML_DESIGN_CHECKOUT = FXML_DESIGN_PREFIX + "Checkout" + FXML_DESIGN_SUFIX;
 	public static final String LANG_BASE_NAME = "i18n/Language";
 
 }

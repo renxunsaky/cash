@@ -14,16 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.surpassun.cash.config.Constants;
-import com.surpassun.cash.config.ScreenManager;
 
 @Component
 public class LoginController extends SimpleController {
 	
 	@Inject
 	private AuthenticationManager authenticationManager;
-	
-	@Inject
-	private ScreenManager screenManager;
 	
 	@FXML
 	TextField username;

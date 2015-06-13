@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,11 +19,15 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.surpassun.cash.config.Constants;
+import com.surpassun.cash.config.ScreenManager;
 
 @Component
 public class SimpleController implements FxController {
 	
 	private final Logger log = LoggerFactory.getLogger(SimpleController.class);
+	
+	@Inject
+	protected ScreenManager screenManager;
 	
 	@Value("${locale.language}")
 	private String language;

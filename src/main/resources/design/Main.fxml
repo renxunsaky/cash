@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -10,13 +12,14 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1150.0" style="-fx-background-color: #408248;" stylesheets="@css/basic.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.surpassun.cash.fx.controller.MainController">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1150.0" style="-fx-background-color: #201030;" stylesheets="@css/basic.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.surpassun.cash.fx.controller.MainController">
    <children>
       <ImageView fitHeight="160.0" fitWidth="320.0" layoutX="70.0" layoutY="140.0" onMouseClicked="#showCheckout" onTouchReleased="#showCheckout" pickOnBounds="true" preserveRatio="true" styleClass="imageView">
          <image>
             <Image url="@img/caisse.png" />
          </image>
       </ImageView>
+     
       <ImageView fitHeight="160.0" fitWidth="320.0" layoutX="420.0" layoutY="140.0" onMouseClicked="#showReporting" onTouchReleased="#showReporting" pickOnBounds="true" preserveRatio="true" styleClass="imageView">
          <image>
             <Image url="@img/reporting.png" />
