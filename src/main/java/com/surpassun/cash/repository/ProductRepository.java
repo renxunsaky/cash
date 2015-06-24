@@ -6,4 +6,5 @@ import com.surpassun.cash.domain.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     
+	public Product findByCode(String code);
 }

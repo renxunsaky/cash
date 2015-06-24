@@ -25,7 +25,7 @@ public class Category implements Serializable {
     @Size(min = 0, max = 100)
     private String code;
 
-    private float discount;
+    private Float discount;
 
 	public String getName() {
 		return name;
@@ -43,11 +43,11 @@ public class Category implements Serializable {
 		this.code = code;
 	}
 
-	public float getDiscount() {
+	public Float getDiscount() {
 		return discount;
 	}
 
-	public void setDiscount(float discount) {
+	public void setDiscount(Float discount) {
 		this.discount = discount;
 	}
     

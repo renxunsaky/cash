@@ -34,15 +34,15 @@ public class Product extends AbstractAuditingEntity implements Serializable {
     private String code;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "categoryId", nullable = false)
+    @JoinColumn(name = "category", nullable = false)
     private Category category;
     
     @NotNull
     private float price;
     
-    private float discount;
+    private Float discount;
     
-    private int quantity;
+    private Integer quantity;
 
 	public long getId() {
 		return id;
@@ -84,19 +84,19 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 		this.price = price;
 	}
 
-	public float getDiscount() {
+	public Float getDiscount() {
 		return discount;
 	}
 
-	public void setDiscount(float discount) {
+	public void setDiscount(Float discount) {
 		this.discount = discount;
 	}
 
-	public int getQuantity() {
+	public Integer getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
 }

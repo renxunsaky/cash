@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,5 +54,10 @@ public class SimpleController implements FxController {
 		} catch (IOException e) {
 			log.error("Error while show scene : {}", fxml, e);
 		}
+	}
+	
+	@FXML
+	public void showMainScreen() {
+		screenManager.showMainScreen();
 	}
 }
