@@ -24,37 +24,17 @@ public class Transaction extends AbstractAuditingEntity implements Serializable 
     private String id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "productId", nullable = false)
-	private Product product;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "clientId", nullable = true)
-    private Client client;
+	@JoinColumn(name = "orderId", nullable = false)
+	private Order order;
 
 	@NotNull
-	private float unitPrice;
-	
-	@NotNull
-	private int quantity;
-	
-	@NotNull
-	private float totalPrice;
-    
-	@NotNull
-    private float discount;
+	private float total;
 	
 	private float cash;
 	
 	private float bankCard;
 	
 	private float giftCard;
-	
-	@NotNull
-	private String terminalId;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "userId", nullable = false)
-	private User user;
 
 	public String getId() {
 		return id;
@@ -64,52 +44,20 @@ public class Transaction extends AbstractAuditingEntity implements Serializable 
 		this.id = id;
 	}
 
-	public Product getProduct() {
-		return product;
+	public Order getOrder() {
+		return order;
 	}
 
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
-	public Client getClient() {
-		return client;
+	public float getTotal() {
+		return total;
 	}
 
-	public void setClient(Client client) {
-		this.client = client;
-	}
-
-	public float getUnitPrice() {
-		return unitPrice;
-	}
-
-	public void setUnitPrice(float unitPrice) {
-		this.unitPrice = unitPrice;
-	}
-
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
-	public float getTotalPrice() {
-		return totalPrice;
-	}
-
-	public void setTotalPrice(float totalPrice) {
-		this.totalPrice = totalPrice;
-	}
-
-	public float getDiscount() {
-		return discount;
-	}
-
-	public void setDiscount(float discount) {
-		this.discount = discount;
+	public void setTotal(float total) {
+		this.total = total;
 	}
 
 	public float getCash() {
@@ -134,21 +82,5 @@ public class Transaction extends AbstractAuditingEntity implements Serializable 
 
 	public void setGiftCard(float giftCard) {
 		this.giftCard = giftCard;
-	}
-
-	public String getTerminalId() {
-		return terminalId;
-	}
-
-	public void setTerminalId(String terminalId) {
-		this.terminalId = terminalId;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 }
