@@ -41,8 +41,8 @@ public class Client extends AbstractAuditingEntity implements Serializable {
     private String city;
     private String phone;
     private String email;
-    private float giftCardBalance;
-    private float totalConsumation;
+    private Float giftCardBalance;
+    private Float totalConsumation;
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "membershipLevelId")
@@ -139,15 +139,15 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 		return giftCardBalance;
 	}
 
-	public void setGiftCardBalance(float giftCardBalance) {
+	public void setGiftCardBalance(Float giftCardBalance) {
 		this.giftCardBalance = giftCardBalance;
 	}
 
-	public float getTotalConsumation() {
+	public Float getTotalConsumation() {
 		return totalConsumation;
 	}
 
-	public void setTotalConsumation(float totalConsumation) {
+	public void setTotalConsumation(Float totalConsumation) {
 		this.totalConsumation = totalConsumation;
 	}
 

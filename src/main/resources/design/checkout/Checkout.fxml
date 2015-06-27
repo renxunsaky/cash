@@ -11,20 +11,18 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyReleased="#handleScannerInput" prefHeight="800.0" prefWidth="800.0" styleClass="checkoutMain" stylesheets="@../css/basic.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.surpassun.cash.fx.controller.CheckoutController">
    <top>
-      <HBox prefHeight="45.0" prefWidth="800" style="-fx-background-color: blue;" styleClass="header" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="60.0" prefWidth="800.0" style="-fx-background-color: blue;" styleClass="header" BorderPane.alignment="CENTER">
          <children>
-            <Label prefHeight="18.0" prefWidth="800.0" text="ID: 1, Name: Thomas Marceau, Addr: 47 Rue de Bellevue 75001 Paris, Phone: 06 79 09 09 09, Level: 4" textFill="WHITE" wrapText="true">
-               <HBox.margin>
-                  <Insets left="10.0" top="5.0" />
-               </HBox.margin>
+            <Label fx:id="clientInfo" layoutX="10.0" layoutY="5.0" prefHeight="18.0" prefWidth="700.0" text="ID: 1, Name: Thomas Marceau, Addr: 47 Rue de Bellevue 75001 Paris, Phone: 06 79 09 09 09, Level: 4" textFill="WHITE" wrapText="true">
             </Label>
-            <Label layoutY="28.0" text="Terminal 1, Employee 1, 11:32:21 09/06/2015" textAlignment="RIGHT" textFill="WHITE">
-               <HBox.margin>
-                  <Insets bottom="5.0" top="28.0" />
-               </HBox.margin>
+            <Button alignment="TOP_RIGHT" layoutY="3.0" mnemonicParsing="false" text="%ui.button.common.modify" textAlignment="CENTER" AnchorPane.rightAnchor="10.0" />
+            <Separator layoutY="32.0" opacity="0.5" prefWidth="800.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <Label fx:id="terminalInfo" alignment="BOTTOM_LEFT" layoutX="10.0" layoutY="35.0" prefWidth="250.0" text="Terminal 1, Employee 1" textAlignment="RIGHT" textFill="WHITE">
+            </Label>
+            <Label fx:id="timer" layoutX="270.0" layoutY="35.0" prefWidth="200.0" text="11:32:21 09/06/2015" textAlignment="RIGHT" textFill="WHITE">
             </Label>
          </children>
-      </HBox>
+      </AnchorPane>
    </top>
    <bottom>
       <HBox prefHeight="175.0" prefWidth="800.0" style="-fx-background-color: pink;" BorderPane.alignment="CENTER">

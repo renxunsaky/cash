@@ -22,6 +22,9 @@ public class MembershipLevel implements Serializable {
     @NotNull
     private String name;
 
+	@NotNull
+    private float discount;
+
     public int getLevel() {
 		return level;
 	}
@@ -45,7 +48,4 @@ public class MembershipLevel implements Serializable {
 	public void setDiscount(float discount) {
 		this.discount = discount;
 	}
-
-	@NotNull
-    private float discount;
 }

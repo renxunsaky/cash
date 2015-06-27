@@ -1,10 +1,16 @@
 package com.surpassun.cash.fx.controller;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,18 +21,25 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.surpassun.cash.config.Constants;
+import com.surpassun.cash.domain.Client;
+import com.surpassun.cash.domain.Config;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.fx.dto.ArticleDto;
+import com.surpassun.cash.repository.ClientRepository;
+import com.surpassun.cash.repository.ConfigRepository;
 import com.surpassun.cash.service.ProductService;
+import com.surpassun.cash.util.CashUtil;
 import com.surpassun.cash.util.StringPool;
 
 @Component
@@ -35,7 +48,19 @@ public class CheckoutController extends SimpleController {
 	private final Logger log = LoggerFactory.getLogger(CheckoutController.class);
 	
 	@Inject
-	private ProductService productService; 
+	private ProductService productService;
+	
+	/******* Properties for header *********/
+	@FXML
+	Label terminalInfo;
+	@FXML
+	Label clientInfo;
+	@FXML
+	Label timer;
+	@Inject
+	private ConfigRepository configRepository;
+	@Inject
+	private ClientRepository clientRepository;
 
 	/******* Properties for calculator *********/
 	@FXML
@@ -75,6 +100,23 @@ public class CheckoutController extends SimpleController {
 		//initialize general properties
 		currentBarcode = new StringBuilder();
 		barcodeList = new HashMap<String, Integer>();
+		
+		//initialize terminal information
+		String employeeName = SecurityContextHolder.getContext().getAuthentication().getName();
+		Config terminalConfig = configRepository.findByName(Constants.TERMINAL_ID + StringPool.COLON + CashUtil.getCurrentMacAddress());
+		String terminalId = terminalConfig != null ? terminalConfig.getValue() : null;
+		StringBuilder sb = new StringBuilder(terminalId).append(", ").append(employeeName);
+		terminalInfo.setText(sb.toString());
+		final DateFormat format = DateFormat.getInstance();
+		final Timeline timeLine = new Timeline(new KeyFrame(Duration.minutes(1), new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				final Calendar cal = Calendar.getInstance();
+				timer.setText(format.format(cal.getTime()));
+			}
+		}));
+		timeLine.setCycleCount(Animation.INDEFINITE);
+		timeLine.play();
 		
 		//initialize article list
 		articleName.setCellValueFactory(new PropertyValueFactory<>("displayName"));
@@ -172,26 +214,41 @@ public class CheckoutController extends SimpleController {
 	public void handleScannerInput(KeyEvent event) {
 		if (event.getCode() == KeyCode.ENTER) {
 			String barcode = currentBarcode.toString();
-			//search barcode in database and display it on the screen
-			Product product = productService.getProductByBarcode(barcode);
-			if (product != null) {
-				Integer quantity = 1;
-				if (barcodeList.containsKey(barcode)) {
-					quantity = barcodeList.get(barcode) + 1;
-				}
-				barcodeList.put(barcode, quantity);
-				ArticleDto articleDto = new ArticleDto(product, quantity);
-				//the equqls method of ArticleDto is overrided, so it is secure to do like this
-				int index = articleList.getItems().indexOf(articleDto);
-				if (index != -1) {
-					articleList.getItems().set(index, articleDto);
+			if (barcode.startsWith(Constants.BARCODE_PREFIX_MEMBER_CARD)) {
+				Client client = clientRepository.findByCode(barcode);
+				if (client != null) {
+					StringBuilder clientInfoBuilder = new StringBuilder();
+					clientInfoBuilder.append(client.getCode()).append(", ").append(client.getFirstname()).append(" ").append(client.getLastname())
+						.append(", ").append(client.getAdress()).append(" ").append(client.getPostcode()).append(" ").append(client.getCity())
+						.append(", ").append(client.getPhone()).append(", ").append(client.getMembershipLevel().getName());
+					clientInfo.setText(clientInfoBuilder.toString());
 				} else {
-					articleList.getItems().add(articleDto);
+					log.warn("Cannot find client with code : {}", barcode);
 				}
+			} else if (barcode.startsWith(Constants.BARCODE_PREFIX_GIFT_CARD)) {
 				
-				updateTotalPrice(articleList.getItems());
 			} else {
-				log.warn("Cannot find product with code : {}", barcode);
+				//search barcode in database and display it on the screen
+				Product product = productService.getProductByBarcode(barcode);
+				if (product != null) {
+					Integer quantity = 1;
+					if (barcodeList.containsKey(barcode)) {
+						quantity = barcodeList.get(barcode) + 1;
+					}
+					barcodeList.put(barcode, quantity);
+					ArticleDto articleDto = new ArticleDto(product, quantity);
+					//the equqls method of ArticleDto is overrided, so it is secure to do like this
+					int index = articleList.getItems().indexOf(articleDto);
+					if (index != -1) {
+						articleList.getItems().set(index, articleDto);
+					} else {
+						articleList.getItems().add(articleDto);
+					}
+					
+					updateTotalPrice(articleList.getItems());
+				} else {
+					log.warn("Cannot find product with code : {}", barcode);
+				}
 			}
 			
 			//clear barcode buffer
