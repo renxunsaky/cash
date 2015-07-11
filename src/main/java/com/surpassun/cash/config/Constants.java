@@ -19,5 +19,10 @@ public interface Constants {
 	public static final String TERMINAL_ID = "TERMINAL_ID";
 	public static final String BARCODE_PREFIX_MEMBER_CARD = "99";
 	public static final String BARCODE_PREFIX_GIFT_CARD = "98";
+	public static final String PAYMENT_MODE_CASH = "paymentCash";
+	public static final String PAYMENT_MODE_BANK_CARD = "paymentBankCard";
+	public static final String PAYMENT_MODE_GIFT_CARD = "paymentGiftCard";
+	public static final String SHORTCUT_PRICES = "SHORTCUT_PRICES";
+	public static final String CLICKED = "clicked";
 
 }

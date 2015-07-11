@@ -6,7 +6,6 @@
 	-fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.6) , 10, 0.5 , 0 , 0 );
 }
 
-
 .checkoutMain .header Label {
 	-fx-font-size: 14px;
 	-fx-font-weight: bold;
@@ -15,4 +14,12 @@
 
 #cancelButton {
 	-fx-color: #FFFFFF;
+}
+
+.paymentButton.clicked, .categoryButton.clicked {
+	-fx-background-color: #DDDDDD;
+}
+
+.clicked {
+	-fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.6) , 10, 0.5 , 0 , 0 );
 }

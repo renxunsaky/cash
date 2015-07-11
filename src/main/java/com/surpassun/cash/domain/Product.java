@@ -44,6 +44,16 @@ public class Product extends AbstractAuditingEntity implements Serializable {
     
     private Integer quantity;
 
+	public Product() {
+	}
+	
+	public Product(String categoryName, String barcode, String priceInfo) {
+		this.name = categoryName;
+		this.code = barcode;
+		this.price = Float.valueOf(priceInfo);
+		this.id = -1;
+	}
+
 	public long getId() {
 		return id;
 	}

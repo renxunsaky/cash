@@ -9,6 +9,7 @@ public class ArticleDto {
 	private String code;
 	private String displayName;
 	private String quantityInfo;
+	private String originalPriceInfo;
 	private String priceInfo;
 	private String otherInfo;
 	private Float discount;
@@ -31,7 +32,7 @@ public class ArticleDto {
 			StringBuilder sb = new StringBuilder();
 			sb.append(originalPrice).append(StringPool.EURO)
 				.append(StringPool.RETURN_NEW_LINE)
-				.append(StringPool.MINUS).append((discount * 100)).append(StringPool.PERCENT).append(" Reduction")
+				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT).append(" Reduction")
 				.append(StringPool.RETURN_NEW_LINE)
 				.append((discount * originalPrice)).append(StringPool.EURO);
 			realPrice = discount * originalPrice;
@@ -54,7 +55,7 @@ public class ArticleDto {
 			originalPrice = this.unitPrice * quantity;
 			sb.append(originalPrice).append(StringPool.EURO)
 				.append(StringPool.RETURN_NEW_LINE)
-				.append(StringPool.MINUS).append((discount * 100)).append(StringPool.PERCENT).append(" Reduction")
+				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT).append(" Reduction")
 				.append(StringPool.RETURN_NEW_LINE)
 				.append((discount * originalPrice)).append(StringPool.EURO);
 			realPrice = discount * originalPrice;
@@ -68,6 +69,23 @@ public class ArticleDto {
 			this.quantityInfo = StringPool.MULTIPLE + StringPool.SPACE + quantity;
 		} else if (quantity == 1) {
 			this.quantityInfo = null;
+		}
+	}
+	
+	public void correctInfo(String discountText) {
+		float originalPrice = unitPrice * quantity;
+		int disc = Integer.valueOf(discountText);
+		discount = disc / 100F;
+		if (discount != null && discount > 0) {
+			StringBuilder sb = new StringBuilder();
+			originalPrice = this.unitPrice * quantity;
+			sb.append(originalPrice).append(StringPool.EURO)
+				.append(StringPool.RETURN_NEW_LINE)
+				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT).append(" Reduction")
+				.append(StringPool.RETURN_NEW_LINE)
+				.append(((1- discount) * originalPrice)).append(StringPool.EURO);
+			realPrice = (1- discount) * originalPrice;
+			this.priceInfo = sb.toString();
 		}
 	}
 	
@@ -97,6 +115,14 @@ public class ArticleDto {
 	public void setQuantityInfo(String quantityInfo) {
 		this.quantityInfo = quantityInfo;
 	}
+	public String getOriginalPriceInfo() {
+		return originalPriceInfo;
+	}
+
+	public void setOriginalPriceInfo(String originalPriceInfo) {
+		this.originalPriceInfo = originalPriceInfo;
+	}
+
 	public String getPriceInfo() {
 		return priceInfo;
 	}

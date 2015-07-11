@@ -3,6 +3,7 @@ package com.surpassun.cash.fx.controller;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.animation.Animation;
@@ -12,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -20,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -32,10 +35,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.surpassun.cash.config.Constants;
+import com.surpassun.cash.domain.Category;
 import com.surpassun.cash.domain.Client;
 import com.surpassun.cash.domain.Config;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.fx.dto.ArticleDto;
+import com.surpassun.cash.repository.CategoryRepository;
 import com.surpassun.cash.repository.ClientRepository;
 import com.surpassun.cash.repository.ConfigRepository;
 import com.surpassun.cash.service.ProductService;
@@ -61,6 +66,8 @@ public class CheckoutController extends SimpleController {
 	private ConfigRepository configRepository;
 	@Inject
 	private ClientRepository clientRepository;
+	@Inject
+	private CategoryRepository categoryRepository;
 
 	/******* Properties for calculator *********/
 	@FXML
@@ -68,6 +75,14 @@ public class CheckoutController extends SimpleController {
 	private Float currentNumber;
 	private Float savedResult;
 	private String currentOperation;
+	
+	/******* Properties for payment method *********/
+	@FXML
+	Button paymentGiftCardButton;
+	@FXML
+	Button paymentBankCardButton;
+	@FXML
+	Button paymentCashButton;
 	
 	/******* Properties for article list *********/
 	@FXML
@@ -87,6 +102,26 @@ public class CheckoutController extends SimpleController {
 	/******* Properties for bar code scanner usage *********/
 	private StringBuilder currentBarcode;
 	private Map<String, Integer> barcodeList;
+	
+	/******* Properties for payment *********/
+	@FXML
+	Label toPay;
+	@FXML
+	Label received;
+	@FXML
+	Label toReturn;
+	private String currentPaymentMode;
+	private float receivedCash;
+	private float receivedBankCard;
+	private float receivedGiftCard;
+	
+	/******* Properties for shortcut buttons *********/
+	@FXML
+	GridPane categoryGrid;
+	@FXML
+	GridPane priceGrid;
+	private Map<String, String> currentCategory = new HashMap<String, String>();
+	
 	
 	public void show(Stage stage) {
 		super.show(this, stage, Constants.FXML_DESIGN_CHECKOUT);
@@ -122,6 +157,37 @@ public class CheckoutController extends SimpleController {
 		articleName.setCellValueFactory(new PropertyValueFactory<>("displayName"));
 		articleOtherInfo.setCellValueFactory(new PropertyValueFactory<>("quantityInfo"));
 		articlePrice.setCellValueFactory(new PropertyValueFactory<>("priceInfo"));
+		
+		//initialize shortcut buttons
+		List<Node> children = categoryGrid.getChildren();
+		List<Category> categories = categoryRepository.findAll();
+		for (int i = 0; i < categories.size(); i++) {
+			Category category = categories.get(i);
+			if(children.size() > i) {
+				Button node = (Button)children.get(i);
+				node.setText(category.getName());
+				node.setId(category.getCode());
+				//set the first button as the default selected one
+				if (i == 0) {
+					currentCategory.put(category.getCode(), category.getName());
+					node.getStyleClass().add(Constants.CLICKED);
+
+					Config config = configRepository.findByName(Constants.SHORTCUT_PRICES + StringPool.COLON + category.getCode());
+					String value = config.getValue();
+					String[] prices = StringUtils.split(value, StringPool.SEMICOLON);
+					
+					List<Node> priceButtons = priceGrid.getChildren();
+					int counter = 0;
+					for (Node priceButton : priceButtons) {
+						Button button = (Button)priceButton;
+						if (prices.length > counter) {
+							button.setText(prices[counter]);
+						}
+						counter++;
+					}//end for
+				}
+			}
+		}//end for
 	}
 
 	private String trim(String text) {
@@ -224,9 +290,12 @@ public class CheckoutController extends SimpleController {
 					clientInfo.setText(clientInfoBuilder.toString());
 				} else {
 					log.warn("Cannot find client with code : {}", barcode);
+					//TODO display warn information on screen
 				}
 			} else if (barcode.startsWith(Constants.BARCODE_PREFIX_GIFT_CARD)) {
-				
+				if (Constants.PAYMENT_MODE_GIFT_CARD.equals(currentPaymentMode)) {
+					//TODO: verify how gift card is used
+				}
 			} else {
 				//search barcode in database and display it on the screen
 				Product product = productService.getProductByBarcode(barcode);
@@ -237,7 +306,7 @@ public class CheckoutController extends SimpleController {
 					}
 					barcodeList.put(barcode, quantity);
 					ArticleDto articleDto = new ArticleDto(product, quantity);
-					//the equqls method of ArticleDto is overrided, so it is secure to do like this
+					//the equals method of ArticleDto is overridden, so it is secure to do like this
 					int index = articleList.getItems().indexOf(articleDto);
 					if (index != -1) {
 						articleList.getItems().set(index, articleDto);
@@ -248,6 +317,7 @@ public class CheckoutController extends SimpleController {
 					updateTotalPrice(articleList.getItems());
 				} else {
 					log.warn("Cannot find product with code : {}", barcode);
+					//TODO display warn information on screen
 				}
 			}
 			
@@ -301,10 +371,145 @@ public class CheckoutController extends SimpleController {
 		for (ArticleDto article : items) {
 			totalPrice += article.getRealPrice();
 		}
-		String text = StringUtils.substringBefore(totalPriceInfo.getText(), StringPool.COLON);
-		StringBuilder sb = new StringBuilder(text).append(StringPool.COLON);
-		sb.append(StringPool.SPACE).append(totalPrice).append(StringPool.SPACE).append(StringPool.EURO);
-		totalPriceInfo.setText(sb.toString());
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("%.2f", totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
+		updateLabel(totalPriceInfo, sb);
 	}
 	
+	
+	@FXML
+	public void beginPayment() {
+		//display total to pay, received information
+		StringBuilder sb = new StringBuilder().append(String.format("%.2f", totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
+		updateLabel(toPay, sb);
+		
+		updateLabel(received, null);
+	}
+	
+	@FXML
+	public void cancelPayment() {
+		//reset payment information
+		receivedBankCard = 0F;
+		receivedCash = 0F;
+		receivedGiftCard = 0F;
+		
+		updateLabel(toPay, null);
+		updateLabel(received, null);
+		updateLabel(toReturn, null);
+	}
+	
+	@FXML
+	public void setPaymentMethod(ActionEvent event) {
+		paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
+		paymentBankCardButton.getStyleClass().remove(Constants.CLICKED);
+		paymentCashButton.getStyleClass().remove(Constants.CLICKED);
+		
+		Button clickedButton = (Button)event.getSource();
+		clickedButton.getStyleClass().add(Constants.CLICKED);
+		
+		currentPaymentMode = clickedButton.getId();
+		if (Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
+			//TODO: propose bank card payment terminal
+		} else {
+			calculatorResult.clear();
+		}
+	}
+	
+	@FXML
+	public void handlePayment() {
+		if (!Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
+			if (Constants.PAYMENT_MODE_CASH.equals(currentPaymentMode)) {
+				receivedCash = Float.parseFloat(calculatorResult.getText());
+			} else {
+				receivedGiftCard = Float.parseFloat(calculatorResult.getText());
+			}
+			float totalReceived = receivedBankCard + receivedCash + receivedGiftCard;
+			StringBuilder sb = new StringBuilder();
+			sb.append(totalReceived).append(StringPool.SPACE).append(StringPool.EURO);
+			updateLabel(received, sb);
+			
+			StringBuilder toReturn = new StringBuilder();
+			toReturn.append(String.format("%.2f", totalReceived - totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
+			updateLabel(this.toReturn, toReturn);
+			currentPaymentMode = null;
+		}
+	}
+	
+	@FXML
+	public void printTicket() {
+		//TODO: print ticket
+	}
+	
+	@FXML
+	public void handleDiscount(ActionEvent event) {
+		Button clickedButton = (Button)event.getSource();
+		String text = clickedButton.getText();
+		String discount = StringUtils.substringBefore(text, StringPool.PERCENT);
+		
+		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
+		if (articleDto != null) {
+			articleDto.correctInfo(discount);
+			int index = articleList.getSelectionModel().getSelectedIndex();
+			articleList.getItems().set(index, articleDto);
+			updateTotalPrice(articleList.getItems());
+			articleList.getSelectionModel().select(index);
+		}
+	}
+	
+	@FXML
+	public void handleCategoryChange(ActionEvent event) {
+		List<Node> children = categoryGrid.getChildren();
+		for (Node node : children) {
+			node.getStyleClass().remove(Constants.CLICKED);
+		}
+		currentCategory.clear();
+		Button clickedButton = (Button)event.getSource();
+		clickedButton.getStyleClass().add(Constants.CLICKED);
+		String categoryCode = clickedButton.getId();
+		currentCategory.put(categoryCode, clickedButton.getText());
+		
+		Config config = configRepository.findByName(Constants.SHORTCUT_PRICES + StringPool.COLON + categoryCode);
+		String value = config.getValue();
+		String[] prices = StringUtils.split(value, StringPool.SEMICOLON);
+		
+		List<Node> priceButtons = priceGrid.getChildren();
+		int counter = 0;
+		for (Node priceButton : priceButtons) {
+			Button button = (Button)priceButton;
+			if (prices.length > counter) {
+				button.setText(prices[counter]);
+			}
+			counter++;
+		}//end for
+	}
+	
+	@FXML
+	public void addProductManually(ActionEvent event) {
+		Button priceButton = (Button)event.getSource();
+		String categoryCode = currentCategory.keySet().iterator().next();
+		String barcode = categoryCode + StringPool.COLON + priceButton.getText();
+		
+		Integer quantity = 1;
+		if (barcodeList.containsKey(barcode)) {
+			quantity = barcodeList.get(barcode) + 1;
+		}
+		barcodeList.put(barcode, quantity);
+		Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
+		ArticleDto articleDto = new ArticleDto(product, quantity);
+		//the equals method of ArticleDto is overridden, so it is secure to do like this
+		int index = articleList.getItems().indexOf(articleDto);
+		if (index != -1) {
+			articleList.getItems().set(index, articleDto);
+		} else {
+			articleList.getItems().add(articleDto);
+		}
+		
+		updateTotalPrice(articleList.getItems());
+	}
+	
+	private void updateLabel(Label label, StringBuilder value) {
+		String text = StringUtils.substringBefore(label.getText(), StringPool.COLON);
+		StringBuilder sb = new StringBuilder(text).append(StringPool.COLON).append(StringPool.SPACE).append(value != null ? value : "");
+		label.setText(sb.toString());
+	}
 }

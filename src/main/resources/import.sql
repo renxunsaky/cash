@@ -13,6 +13,9 @@ insert into T_PRODUCT(id, name, code, category, price, created_by, created_date)
 insert into T_PRODUCT(id, name, code, category, price, created_by, created_date) values(6, 'Lee', '200002', 'pantalon', 49.9, 'system', sysdate);
 
 insert into T_CONFIG(id, name, value, description) values(1, 'TERMINAL_ID:00-23-6C-8F-B4-75', 'Terminal Tomat', null);
+insert into T_CONFIG(id, name, value, description) values(2, 'SHORTCUT_PRICES:10', '5.99;7.99;9.99;14.99;17.99;19.99;24.99;29.99', null);
+insert into T_CONFIG(id, name, value, description) values(3, 'SHORTCUT_PRICES:20', '5.99;7.99;9.99;14.99;17.99;19.99;24.99;29.99', null);
+insert into T_CONFIG(id, name, value, description) values(4, 'SHORTCUT_PRICES:30', '6.99;7.99;9.99;14.99;17.99;19.99;49.99;99.99', null);
 
 insert into T_MemebershipLevel(level, name, discount) values(1, 'Golden', 0.25);
 insert into T_MemebershipLevel(level, name, discount) values(2, 'Black', 0.2);
