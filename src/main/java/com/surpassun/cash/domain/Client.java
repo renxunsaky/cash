@@ -41,7 +41,6 @@ public class Client extends AbstractAuditingEntity implements Serializable {
     private String city;
     private String phone;
     private String email;
-    private Float giftCardBalance;
     private Float totalConsumation;
     
     @ManyToOne(fetch = FetchType.EAGER)
@@ -133,14 +132,6 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public float getGiftCardBalance() {
-		return giftCardBalance;
-	}
-
-	public void setGiftCardBalance(Float giftCardBalance) {
-		this.giftCardBalance = giftCardBalance;
 	}
 
 	public Float getTotalConsumation() {

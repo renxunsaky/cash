@@ -48,7 +48,12 @@
       			
       			<AnchorPane prefHeight="450.0" prefWidth="400.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="0.0">
       			   <children>
-      			      <Label layoutX="28.0" layoutY="30.0" prefHeight="16.0" prefWidth="92.0" text="%ui.label.checkout.article.list" />
+                  <Label fx:id="warnInfo" alignment="CENTER" layoutX="20.0" layoutY="10.0" prefHeight="30.0" prefWidth="360.0" text="Client with this barcode cannot be found" textAlignment="CENTER" textFill="#ff8400" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+      			      <Label layoutX="20.0" layoutY="45.0" prefHeight="16.0" prefWidth="92.0" text="%ui.label.checkout.article.list" />
                         <TableView fx:id="articleList" layoutX="28.0" layoutY="66.0" prefHeight="300.0" prefWidth="400.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                           <columns>
                             <TableColumn fx:id="articleName" editable="false" maxWidth="1.7976931348623157E308" minWidth="150.0" prefWidth="200.0" sortable="false" text="%ui.table.checkout.header.name" />
@@ -147,7 +152,7 @@
                                     <Insets left="7.0" />
                                  </GridPane.margin>
                               </Button>
-                              <Button layoutX="22.0" layoutY="195.0" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="45.0" text="," GridPane.columnIndex="1" GridPane.rowIndex="4">
+                              <Button layoutX="22.0" layoutY="195.0" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="45.0" text="." GridPane.columnIndex="1" GridPane.rowIndex="4">
                                  <GridPane.margin>
                                     <Insets left="7.0" />
                                  </GridPane.margin>

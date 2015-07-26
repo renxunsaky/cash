@@ -20,45 +20,34 @@ public class ArticleDto {
 	public ArticleDto() {
 	};
 	
-	public ArticleDto(Product product, Integer quantity) {
+	public ArticleDto(Product product, Integer quantity, Float strickDiscount) {
 		this.id = product.getId();
 		this.code = product.getCode();
 		this.displayName = product.getName();
 		this.unitPrice = product.getPrice();
-		this.quantity = quantity;
-		float originalPrice = product.getPrice() * quantity;
 		this.discount = product.getDiscount();
-		if (discount != null && discount > 0) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(originalPrice).append(StringPool.EURO)
-				.append(StringPool.RETURN_NEW_LINE)
-				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT).append(" Reduction")
-				.append(StringPool.RETURN_NEW_LINE)
-				.append((discount * originalPrice)).append(StringPool.EURO);
-			realPrice = discount * originalPrice;
-			this.priceInfo = sb.toString();
-		} else {
-			realPrice = originalPrice;
-			this.priceInfo = originalPrice + " €";
-		}
+		this.quantity = quantity;
 		
-		if (quantity != null && quantity > 1) {
-			this.quantityInfo = StringPool.MULTIPLE + StringPool.SPACE + quantity;
+		if (strickDiscount != null) {
+			this.quantity = quantity = 1;
+			this.discount = strickDiscount;
+			this.code += ":" + strickDiscount;
 		}
+		correctInfo(this.quantity, strickDiscount != null);
 	}
 	
-	public void correctInfo(Integer quantity) {
+	public void correctInfo(Integer quantity, boolean strickModeOn) {
 		this.quantity = quantity;
 		float originalPrice = unitPrice * quantity;
 		if (discount != null && discount > 0) {
 			StringBuilder sb = new StringBuilder();
-			originalPrice = this.unitPrice * quantity;
+			originalPrice = this.unitPrice * this.quantity;
 			sb.append(originalPrice).append(StringPool.EURO)
 				.append(StringPool.RETURN_NEW_LINE)
-				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT).append(" Reduction")
+				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT)
 				.append(StringPool.RETURN_NEW_LINE)
-				.append((discount * originalPrice)).append(StringPool.EURO);
-			realPrice = discount * originalPrice;
+				.append((String.format("%.0f", (1- discount) * originalPrice))).append(StringPool.EURO);
+			realPrice = (1- discount) * originalPrice;
 			this.priceInfo = sb.toString();
 		} else {
 			realPrice = originalPrice;
@@ -73,20 +62,10 @@ public class ArticleDto {
 	}
 	
 	public void correctInfo(String discountText) {
-		float originalPrice = unitPrice * quantity;
 		int disc = Integer.valueOf(discountText);
-		discount = disc / 100F;
-		if (discount != null && discount > 0) {
-			StringBuilder sb = new StringBuilder();
-			originalPrice = this.unitPrice * quantity;
-			sb.append(originalPrice).append(StringPool.EURO)
-				.append(StringPool.RETURN_NEW_LINE)
-				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT).append(" Reduction")
-				.append(StringPool.RETURN_NEW_LINE)
-				.append(((1- discount) * originalPrice)).append(StringPool.EURO);
-			realPrice = (1- discount) * originalPrice;
-			this.priceInfo = sb.toString();
-		}
+		this.discount = disc / 100F;
+		
+		correctInfo(quantity, false);
 	}
 	
 	public long getId() {
@@ -181,7 +160,10 @@ public class ArticleDto {
 		
 		ArticleDto dto = (ArticleDto)obj;
 		if (dto.getCode() != null && this.getCode() != null && dto.getCode().equals(this.getCode())) {
-			return true;
+			if (((discount != null && dto.getDiscount() != null && discount.equals(dto.getDiscount()))
+					|| discount == null && dto.getDiscount() == null)) {
+				return true;
+			}
 		}
 		
 		return false;

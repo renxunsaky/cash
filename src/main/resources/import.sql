@@ -16,6 +16,10 @@ insert into T_CONFIG(id, name, value, description) values(1, 'TERMINAL_ID:00-23-
 insert into T_CONFIG(id, name, value, description) values(2, 'SHORTCUT_PRICES:10', '5.99;7.99;9.99;14.99;17.99;19.99;24.99;29.99', null);
 insert into T_CONFIG(id, name, value, description) values(3, 'SHORTCUT_PRICES:20', '5.99;7.99;9.99;14.99;17.99;19.99;24.99;29.99', null);
 insert into T_CONFIG(id, name, value, description) values(4, 'SHORTCUT_PRICES:30', '6.99;7.99;9.99;14.99;17.99;19.99;49.99;99.99', null);
+insert into T_CONFIG(id, name, value, description) values(5, 'STRICK_REDUCTION_ACTIVE', 'true', null);
+insert into T_CONFIG(id, name, value, description) values(6, 'STRICK_REDUCTION_VALUE', '0;0.2;0.3', null);
+insert into T_CONFIG(id, name, value, description) values(7, 'LOCALE', 'FR', null);
+insert into T_CONFIG(id, name, value, description) values(8, 'ADMIN_PASSWORD', 'admin', null);
 
 insert into T_MemebershipLevel(level, name, discount) values(1, 'Golden', 0.25);
 insert into T_MemebershipLevel(level, name, discount) values(2, 'Black', 0.2);

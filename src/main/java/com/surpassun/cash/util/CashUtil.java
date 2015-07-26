@@ -4,6 +4,15 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Optional;
+
+import javafx.animation.FadeTransition;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
+import javafx.util.Duration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,5 +42,40 @@ public class CashUtil {
 			return null;
 		}
 	}
+	
+	public static void makeFadeOutAnimation(int duration, Node target) {
+		FadeTransition ft = new FadeTransition(Duration.millis(duration), target);
+		ft.setFromValue(1.0);
+		ft.setToValue(0);
+		ft.play();
+	}
+	
+	/**
+	 * create a popup dialog and wait for user's choice
+	 * 
+	 * @param title
+	 * @param headerText
+	 * @param contentText
+	 * @return true if the user hit "OK", else return false
+	 */
+	public static boolean createConfirmPopup(String title, String headerText, String contentText) {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(headerText);
+		alert.setContentText(contentText);
 
+		Optional<ButtonType> result = alert.showAndWait();
+		return result.get() == ButtonType.OK;
+	}
+
+	public static String createInputPopup(String title, String headerText, String contentText) {
+		TextInputDialog dialog = new TextInputDialog();
+		dialog.setTitle(title);
+		dialog.setHeaderText(headerText);
+		dialog.setContentText(contentText);
+
+		// Traditional way to get the response value.
+		Optional<String> result = dialog.showAndWait();
+		return result.isPresent() ? result.get() : null;
+	}
 }

@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * diverse configurations
  */
@@ -61,6 +63,29 @@ public class Config implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public boolean getBooleanValue() {
+		return Boolean.valueOf(value);
+	}
+	
+	public int getIntegerValue() {
+		return Integer.valueOf(value);
+	}
+
+	public Float[] getArrayInFloat(char splitter) {
+		if (value == null || StringUtils.isEmpty(value)) {
+			return null;
+		}
+		
+		String[] values = StringUtils.split(value, splitter);
+		Float[] result = new Float[values.length];
+		int counter = 0;
+		for (String temp : values) {
+			result[counter] = Float.valueOf(temp);
+			counter++;
+		}
+		return result;
 	}
 
 }

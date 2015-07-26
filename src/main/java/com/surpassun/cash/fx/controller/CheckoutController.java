@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javafx.animation.Animation;
@@ -38,13 +39,18 @@ import com.surpassun.cash.config.Constants;
 import com.surpassun.cash.domain.Category;
 import com.surpassun.cash.domain.Client;
 import com.surpassun.cash.domain.Config;
+import com.surpassun.cash.domain.GiftCard;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.fx.dto.ArticleDto;
 import com.surpassun.cash.repository.CategoryRepository;
 import com.surpassun.cash.repository.ClientRepository;
 import com.surpassun.cash.repository.ConfigRepository;
+import com.surpassun.cash.repository.GiftCardRepository;
+import com.surpassun.cash.service.OperationAuditService;
 import com.surpassun.cash.service.ProductService;
+import com.surpassun.cash.util.CacheUtil;
 import com.surpassun.cash.util.CashUtil;
+import com.surpassun.cash.util.LanguageUtil;
 import com.surpassun.cash.util.StringPool;
 
 @Component
@@ -68,6 +74,8 @@ public class CheckoutController extends SimpleController {
 	private ClientRepository clientRepository;
 	@Inject
 	private CategoryRepository categoryRepository;
+	@Inject
+	private OperationAuditService auditService;
 
 	/******* Properties for calculator *********/
 	@FXML
@@ -83,6 +91,7 @@ public class CheckoutController extends SimpleController {
 	Button paymentBankCardButton;
 	@FXML
 	Button paymentCashButton;
+	private boolean paymentInProcess;
 	
 	/******* Properties for article list *********/
 	@FXML
@@ -95,13 +104,18 @@ public class CheckoutController extends SimpleController {
 	TableColumn<ArticleDto, String> articlePrice;
 	@FXML
 	Label totalPriceInfo;
+	@FXML
+	Label warnInfo;
 	
 	private float totalPrice;
+	private boolean strickModeOn;
+	private Float[] strickReductions;
 	
 	
 	/******* Properties for bar code scanner usage *********/
 	private StringBuilder currentBarcode;
 	private Map<String, Integer> barcodeList;
+	private GiftCardRepository giftCardRepository;
 	
 	/******* Properties for payment *********/
 	@FXML
@@ -157,6 +171,19 @@ public class CheckoutController extends SimpleController {
 		articleName.setCellValueFactory(new PropertyValueFactory<>("displayName"));
 		articleOtherInfo.setCellValueFactory(new PropertyValueFactory<>("quantityInfo"));
 		articlePrice.setCellValueFactory(new PropertyValueFactory<>("priceInfo"));
+		
+		//initialize configuration
+		Config strickReductionActive = configRepository.findByName(Constants.STRICK_REDUCTION_ACTIVE);
+		strickModeOn = strickReductionActive != null ? strickReductionActive.getBooleanValue() : false;
+		Config strickReductionValue = configRepository.findByName(Constants.STRICK_REDUCTION_VALUE);
+		strickReductions = strickReductionValue.getArrayInFloat(';');
+		Config langConfig = configRepository.findByName(Constants.LOCALE);
+		Locale locale = new Locale(langConfig.getValue());
+		CacheUtil.putCache(Constants.LOCALE, locale);
+		warnInfo.setText("");
+		
+		Config adminPassword = configRepository.findByName(Constants.ADMIN_PASSWORD);
+		CacheUtil.putCache(Constants.ADMIN_PASSWORD, adminPassword.getValue());
 		
 		//initialize shortcut buttons
 		List<Node> children = categoryGrid.getChildren();
@@ -290,34 +317,53 @@ public class CheckoutController extends SimpleController {
 					clientInfo.setText(clientInfoBuilder.toString());
 				} else {
 					log.warn("Cannot find client with code : {}", barcode);
-					//TODO display warn information on screen
+					warnInfo.setText(LanguageUtil.getMessage("ui.label.warn.client.not.found", barcode));
+					CashUtil.makeFadeOutAnimation(5000, warnInfo);
 				}
 			} else if (barcode.startsWith(Constants.BARCODE_PREFIX_GIFT_CARD)) {
 				if (Constants.PAYMENT_MODE_GIFT_CARD.equals(currentPaymentMode)) {
-					//TODO: verify how gift card is used
-				}
-			} else {
-				//search barcode in database and display it on the screen
-				Product product = productService.getProductByBarcode(barcode);
-				if (product != null) {
-					Integer quantity = 1;
-					if (barcodeList.containsKey(barcode)) {
-						quantity = barcodeList.get(barcode) + 1;
-					}
-					barcodeList.put(barcode, quantity);
-					ArticleDto articleDto = new ArticleDto(product, quantity);
-					//the equals method of ArticleDto is overridden, so it is secure to do like this
-					int index = articleList.getItems().indexOf(articleDto);
-					if (index != -1) {
-						articleList.getItems().set(index, articleDto);
+					GiftCard giftCard = giftCardRepository.findByCode(barcode);
+					float giftCardBalance = giftCard.getBalance();
+					float toBePayed = totalPrice - receivedGiftCard - receivedBankCard - receivedCash;
+					boolean confirm = false;
+					if (giftCardBalance - toBePayed >= 0) {
+						confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
+								LanguageUtil.getMessage("ui.popup.giftcard.header", toBePayed),
+								LanguageUtil.getMessage("ui.popup.confirmation.content"));
+						if (confirm) {
+							receivedGiftCard += toBePayed;
+							giftCardBalance -= toBePayed;
+							toBePayed = 0;
+						}
 					} else {
-						articleList.getItems().add(articleDto);
+						confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
+								LanguageUtil.getMessage("ui.popup.giftcard.header.balance.not.enough", toBePayed),
+								LanguageUtil.getMessage("ui.popup.confirmation.content.use.left", giftCardBalance));
+						if (confirm) {
+							receivedGiftCard += giftCardBalance;
+							toBePayed -= giftCardBalance;
+							giftCardBalance = 0;
+						}
 					}
-					
-					updateTotalPrice(articleList.getItems());
-				} else {
-					log.warn("Cannot find product with code : {}", barcode);
-					//TODO display warn information on screen
+					if (confirm) {
+						StringBuilder sb = new StringBuilder().append(String.format("%.2f", toBePayed)).append(StringPool.SPACE).append(StringPool.EURO);
+						updateLabel(toPay, sb);
+						
+						StringBuilder sb1 = new StringBuilder().append(String.format("%.2f", totalPrice - toBePayed)).append(StringPool.SPACE).append(StringPool.EURO);
+						updateLabel(received, sb1);
+					}
+				}
+			} else if (StringUtils.isNotBlank(barcode)) {
+				if (!paymentInProcess) {
+					//search barcode in database and display it on the screen
+					Product product = productService.getProductByBarcode(barcode);
+					if (product != null) {
+						addProduct(barcode, product);
+					} else {
+						log.warn("Cannot find product with code : {}", barcode);
+						warnInfo.setText(LanguageUtil.getMessage("ui.label.warn.product.not.found", barcode));
+						CashUtil.makeFadeOutAnimation(5000, warnInfo);
+					}
 				}
 			}
 			
@@ -330,39 +376,85 @@ public class CheckoutController extends SimpleController {
 
 	@FXML
 	public void increaseQuantity() {
-		changeQuantity(true);
+		if (!paymentInProcess) {
+			int scannedNumber = articleList.getItems().size();
+			Float strickDiscount = null;
+			if (strickModeOn && strickReductions.length > scannedNumber) {
+				strickDiscount = strickReductions[scannedNumber];
+			}
+			if (strickDiscount != null) {
+				ArticleDto selectedItem = articleList.getSelectionModel().getSelectedItem();
+				Product product = new Product();
+				product.setId(selectedItem.getId());
+				product.setPrice(selectedItem.getUnitPrice());
+				product.setCode(selectedItem.getCode());
+				product.setName(selectedItem.getDisplayName());
+				product.setDiscount(selectedItem.getDiscount());
+				addProduct(selectedItem.getCode(), product);
+			} else {
+				changeQuantity(true);
+			}
+		}
 	}
 	
 	@FXML
 	public void decreaseQuantity() {
-		changeQuantity(false);
+		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
+		if (articleDto != null) {
+			int quantity = barcodeList.get(articleDto.getCode());
+			if (!paymentInProcess && quantity > 1) {
+				String password = CashUtil.createInputPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
+						LanguageUtil.getMessage("ui.popup.require.password"),
+						LanguageUtil.getMessage("ui.popup.enter.password"));
+				if (CacheUtil.getCache(Constants.ADMIN_PASSWORD).equals(password)) {
+					auditService.addAudit(StringUtils.substringBefore(terminalInfo.getText(), StringPool.COMMA),
+							StringUtils.substringAfter(terminalInfo.getText(), StringPool.COMMA),
+							articleDto, Constants.OPERATION_TYPE_DECREASE_QUANTITY);
+					changeQuantity(false);
+				} else {
+					warnInfo.setText(LanguageUtil.getMessage("ui.label.warn.admin.password.incorrect"));
+					CashUtil.makeFadeOutAnimation(5000, warnInfo);
+				}
+			}
+		}
 	}
 	
 	private void changeQuantity(boolean isIncrease) {
 		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
 		if (articleDto != null) {
 			int quantity = barcodeList.get(articleDto.getCode());
-			quantity = isIncrease ? quantity + 1 : quantity -1;
+			quantity = isIncrease ? quantity + 1 : quantity - 1;
 			if (quantity > 0) {
-				articleDto.correctInfo(quantity);
+				articleDto.correctInfo(quantity, strickModeOn);
 				int index = articleList.getSelectionModel().getSelectedIndex();
 				articleList.getItems().set(index, articleDto);
 				updateTotalPrice(articleList.getItems());
 				barcodeList.put(articleDto.getCode(), quantity);
 				articleList.getSelectionModel().select(index);
-			} else {
-				deleteCurrentSelection();
 			}
 		}
 	}
 	
 	@FXML
 	public void deleteCurrentSelection() {
-		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
-		if (articleDto != null) {
-			articleList.getItems().remove(articleDto);
-			updateTotalPrice(articleList.getItems());
-			barcodeList.remove(articleDto.getCode());
+		if (!paymentInProcess) {
+			String password = CashUtil.createInputPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
+					LanguageUtil.getMessage("ui.popup.require.password"),
+					LanguageUtil.getMessage("ui.popup.enter.password"));
+			if (CacheUtil.getCache(Constants.ADMIN_PASSWORD).equals(password)) {
+				ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
+				if (articleDto != null) {
+					auditService.addAudit(StringUtils.substringBefore(terminalInfo.getText(), StringPool.COMMA),
+							StringUtils.substringAfter(terminalInfo.getText(), StringPool.COMMA), articleDto, Constants.OPERATION_TYPE_DELETE);
+					
+					articleList.getItems().remove(articleDto);
+					updateTotalPrice(articleList.getItems());
+					barcodeList.remove(articleDto.getCode());
+				}
+			} else {
+				warnInfo.setText(LanguageUtil.getMessage("ui.label.warn.admin.password.incorrect"));
+				CashUtil.makeFadeOutAnimation(5000, warnInfo);
+			}
 		}
 	}
 	
@@ -379,6 +471,7 @@ public class CheckoutController extends SimpleController {
 	
 	@FXML
 	public void beginPayment() {
+		paymentInProcess = true;
 		//display total to pay, received information
 		StringBuilder sb = new StringBuilder().append(String.format("%.2f", totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
 		updateLabel(toPay, sb);
@@ -388,6 +481,7 @@ public class CheckoutController extends SimpleController {
 	
 	@FXML
 	public void cancelPayment() {
+		paymentInProcess = false;
 		//reset payment information
 		receivedBankCard = 0F;
 		receivedCash = 0F;
@@ -396,42 +490,49 @@ public class CheckoutController extends SimpleController {
 		updateLabel(toPay, null);
 		updateLabel(received, null);
 		updateLabel(toReturn, null);
+		
+		currentPaymentMode = null;
+		paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
+		paymentBankCardButton.getStyleClass().remove(Constants.CLICKED);
+		paymentCashButton.getStyleClass().remove(Constants.CLICKED);
 	}
 	
 	@FXML
 	public void setPaymentMethod(ActionEvent event) {
-		paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
-		paymentBankCardButton.getStyleClass().remove(Constants.CLICKED);
-		paymentCashButton.getStyleClass().remove(Constants.CLICKED);
-		
-		Button clickedButton = (Button)event.getSource();
-		clickedButton.getStyleClass().add(Constants.CLICKED);
-		
-		currentPaymentMode = clickedButton.getId();
-		if (Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
-			//TODO: propose bank card payment terminal
-		} else {
-			calculatorResult.clear();
+		if (paymentInProcess) {
+			paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
+			paymentBankCardButton.getStyleClass().remove(Constants.CLICKED);
+			paymentCashButton.getStyleClass().remove(Constants.CLICKED);
+			
+			Button clickedButton = (Button)event.getSource();
+			clickedButton.getStyleClass().add(Constants.CLICKED);
+			
+			currentPaymentMode = clickedButton.getId();
+			if (Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
+				//TODO: propose bank card payment terminal
+			} else {
+				calculatorResult.clear();
+			}
 		}
 	}
 	
 	@FXML
 	public void handlePayment() {
-		if (!Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
-			if (Constants.PAYMENT_MODE_CASH.equals(currentPaymentMode)) {
-				receivedCash = Float.parseFloat(calculatorResult.getText());
-			} else {
-				receivedGiftCard = Float.parseFloat(calculatorResult.getText());
+		if (paymentInProcess) {
+			if (!Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
+				if (Constants.PAYMENT_MODE_CASH.equals(currentPaymentMode)) {
+					receivedCash = Float.parseFloat(calculatorResult.getText());
+				}
+				float totalReceived = receivedBankCard + receivedCash + receivedGiftCard;
+				StringBuilder sb = new StringBuilder();
+				sb.append(totalReceived).append(StringPool.SPACE).append(StringPool.EURO);
+				updateLabel(received, sb);
+				
+				StringBuilder toReturn = new StringBuilder();
+				toReturn.append(String.format("%.2f", totalReceived - totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
+				updateLabel(this.toReturn, toReturn);
+				currentPaymentMode = null;
 			}
-			float totalReceived = receivedBankCard + receivedCash + receivedGiftCard;
-			StringBuilder sb = new StringBuilder();
-			sb.append(totalReceived).append(StringPool.SPACE).append(StringPool.EURO);
-			updateLabel(received, sb);
-			
-			StringBuilder toReturn = new StringBuilder();
-			toReturn.append(String.format("%.2f", totalReceived - totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
-			updateLabel(this.toReturn, toReturn);
-			currentPaymentMode = null;
 		}
 	}
 	
@@ -442,21 +543,23 @@ public class CheckoutController extends SimpleController {
 	
 	@FXML
 	public void handleDiscount(ActionEvent event) {
-		Button clickedButton = (Button)event.getSource();
-		String text = clickedButton.getText();
-		String discount = StringUtils.substringBefore(text, StringPool.PERCENT);
-		
-		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
-		if (articleDto != null) {
-			articleDto.correctInfo(discount);
-			int index = articleList.getSelectionModel().getSelectedIndex();
-			articleList.getItems().set(index, articleDto);
-			updateTotalPrice(articleList.getItems());
-			articleList.getSelectionModel().select(index);
+		if (!paymentInProcess) {
+			Button clickedButton = (Button)event.getSource();
+			String text = clickedButton.getText();
+			String discount = StringUtils.substringBefore(text, StringPool.PERCENT);
+			
+			ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
+			if (articleDto != null) {
+				articleDto.correctInfo(discount);
+				int index = articleList.getSelectionModel().getSelectedIndex();
+				articleList.getItems().set(index, articleDto);
+				updateTotalPrice(articleList.getItems());
+				articleList.getSelectionModel().select(index);
+			}
 		}
 	}
 	
-	@FXML
+	@FXML	
 	public void handleCategoryChange(ActionEvent event) {
 		List<Node> children = categoryGrid.getChildren();
 		for (Node node : children) {
@@ -485,20 +588,37 @@ public class CheckoutController extends SimpleController {
 	
 	@FXML
 	public void addProductManually(ActionEvent event) {
-		Button priceButton = (Button)event.getSource();
-		String categoryCode = currentCategory.keySet().iterator().next();
-		String barcode = categoryCode + StringPool.COLON + priceButton.getText();
+		if(!paymentInProcess) {
+			Button priceButton = (Button)event.getSource();
+			String categoryCode = currentCategory.keySet().iterator().next();
+			String barcode = categoryCode + StringPool.COLON + priceButton.getText();
+			
+			Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
+			addProduct(barcode, product);
+		}
+	}
+	
+	private void addProduct(String barcode, Product product) {
+		int scannedNumber = articleList.getItems().size();
+		Float strickDiscount = null;
+		if (strickModeOn && strickReductions.length > scannedNumber) {
+			strickDiscount = strickReductions[scannedNumber];
+		}
 		
 		Integer quantity = 1;
 		if (barcodeList.containsKey(barcode)) {
 			quantity = barcodeList.get(barcode) + 1;
 		}
-		barcodeList.put(barcode, quantity);
-		Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
-		ArticleDto articleDto = new ArticleDto(product, quantity);
+		//If strick mode is on, and they are the first three products, do not add them to the map
+		if (strickDiscount == null) {
+			barcodeList.put(barcode, quantity);
+		} else {
+			barcodeList.put(barcode + ":" + strickDiscount, quantity);
+		}
+		ArticleDto articleDto = new ArticleDto(product, quantity, strickDiscount);
 		//the equals method of ArticleDto is overridden, so it is secure to do like this
 		int index = articleList.getItems().indexOf(articleDto);
-		if (index != -1) {
+		if (index != -1 && strickDiscount == null) {
 			articleList.getItems().set(index, articleDto);
 		} else {
 			articleList.getItems().add(articleDto);
