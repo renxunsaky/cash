@@ -180,6 +180,11 @@
         	<artifactId>commons-lang3</artifactId>
         	<version>3.3.2</version>
         </dependency>
+        <dependency>
+        	<groupId>org.eclipse.birt.runtime.3_7_1</groupId>
+        	<artifactId>org.apache.xerces</artifactId>
+        	<version>2.9.0</version>
+        </dependency>
     </dependencies>
     
     <profiles>

@@ -38,14 +38,13 @@ import org.springframework.stereotype.Component;
 import com.surpassun.cash.config.Constants;
 import com.surpassun.cash.domain.Category;
 import com.surpassun.cash.domain.Client;
-import com.surpassun.cash.domain.Config;
 import com.surpassun.cash.domain.GiftCard;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.fx.dto.ArticleDto;
 import com.surpassun.cash.repository.CategoryRepository;
 import com.surpassun.cash.repository.ClientRepository;
-import com.surpassun.cash.repository.ConfigRepository;
 import com.surpassun.cash.repository.GiftCardRepository;
+import com.surpassun.cash.service.ConfigService;
 import com.surpassun.cash.service.OperationAuditService;
 import com.surpassun.cash.service.ProductService;
 import com.surpassun.cash.util.CacheUtil;
@@ -69,7 +68,7 @@ public class CheckoutController extends SimpleController {
 	@FXML
 	Label timer;
 	@Inject
-	private ConfigRepository configRepository;
+	private ConfigService configService;
 	@Inject
 	private ClientRepository clientRepository;
 	@Inject
@@ -133,8 +132,11 @@ public class CheckoutController extends SimpleController {
 	@FXML
 	GridPane categoryGrid;
 	@FXML
+	GridPane productGrid;
+	@FXML
 	GridPane priceGrid;
 	private Map<String, String> currentCategory = new HashMap<String, String>();
+	private Map<String, String> currentProduct = new HashMap<String, String>();
 	
 	
 	public void show(Stage stage) {
@@ -152,8 +154,7 @@ public class CheckoutController extends SimpleController {
 		
 		//initialize terminal information
 		String employeeName = SecurityContextHolder.getContext().getAuthentication().getName();
-		Config terminalConfig = configRepository.findByName(Constants.TERMINAL_ID + StringPool.COLON + CashUtil.getCurrentMacAddress());
-		String terminalId = terminalConfig != null ? terminalConfig.getValue() : null;
+		String terminalId = configService.findByName(Constants.TERMINAL_ID + StringPool.COLON + CashUtil.getCurrentMacAddress());
 		StringBuilder sb = new StringBuilder(terminalId).append(", ").append(employeeName);
 		terminalInfo.setText(sb.toString());
 		final DateFormat format = DateFormat.getInstance();
@@ -173,17 +174,14 @@ public class CheckoutController extends SimpleController {
 		articlePrice.setCellValueFactory(new PropertyValueFactory<>("priceInfo"));
 		
 		//initialize configuration
-		Config strickReductionActive = configRepository.findByName(Constants.STRICK_REDUCTION_ACTIVE);
-		strickModeOn = strickReductionActive != null ? strickReductionActive.getBooleanValue() : false;
-		Config strickReductionValue = configRepository.findByName(Constants.STRICK_REDUCTION_VALUE);
-		strickReductions = strickReductionValue.getArrayInFloat(';');
-		Config langConfig = configRepository.findByName(Constants.LOCALE);
-		Locale locale = new Locale(langConfig.getValue());
+		strickModeOn = configService.findBoolean(Constants.STRICK_REDUCTION_ACTIVE);
+		strickReductions = configService.findFloatListByName(Constants.STRICK_REDUCTION_VALUE);
+		Locale locale = new Locale(configService.findByName(Constants.LOCALE));
 		CacheUtil.putCache(Constants.LOCALE, locale);
 		warnInfo.setText("");
 		
-		Config adminPassword = configRepository.findByName(Constants.ADMIN_PASSWORD);
-		CacheUtil.putCache(Constants.ADMIN_PASSWORD, adminPassword.getValue());
+		String adminPassword = configService.findByName(Constants.ADMIN_PASSWORD);
+		CacheUtil.putCache(Constants.ADMIN_PASSWORD, adminPassword);
 		
 		//initialize shortcut buttons
 		List<Node> children = categoryGrid.getChildren();
@@ -199,19 +197,7 @@ public class CheckoutController extends SimpleController {
 					currentCategory.put(category.getCode(), category.getName());
 					node.getStyleClass().add(Constants.CLICKED);
 
-					Config config = configRepository.findByName(Constants.SHORTCUT_PRICES + StringPool.COLON + category.getCode());
-					String value = config.getValue();
-					String[] prices = StringUtils.split(value, StringPool.SEMICOLON);
-					
-					List<Node> priceButtons = priceGrid.getChildren();
-					int counter = 0;
-					for (Node priceButton : priceButtons) {
-						Button button = (Button)priceButton;
-						if (prices.length > counter) {
-							button.setText(prices[counter]);
-						}
-						counter++;
-					}//end for
+					initializeShortcutButtons(category.getCode());
 				}
 			}
 		}//end for
@@ -571,10 +557,54 @@ public class CheckoutController extends SimpleController {
 		String categoryCode = clickedButton.getId();
 		currentCategory.put(categoryCode, clickedButton.getText());
 		
-		Config config = configRepository.findByName(Constants.SHORTCUT_PRICES + StringPool.COLON + categoryCode);
-		String value = config.getValue();
-		String[] prices = StringUtils.split(value, StringPool.SEMICOLON);
+		initializeShortcutButtons(categoryCode);
+	}
+	
+	@FXML	
+	public void handleProductChange(ActionEvent event) {
+		List<Node> children = productGrid.getChildren();
+		for (Node node : children) {
+			node.getStyleClass().remove(Constants.CLICKED);
+		}
+		currentProduct.clear();
+		Button clickedButton = (Button)event.getSource();
+		clickedButton.getStyleClass().add(Constants.CLICKED);
+		String productCode = clickedButton.getId();
+		currentProduct.put(productCode, clickedButton.getText());
 		
+		initializePriceButtons(productCode);
+	}
+
+	private void initializeShortcutButtons(String categoryCode) {
+		String[] products = configService.findListByName(Constants.SHORTCUT_PRODUCTS + StringPool.COLON + categoryCode);
+		
+		if (products != null && products.length > 0) {
+			List<Node> productButtons = productGrid.getChildren();
+			int counter = 0;
+			for (Node productButton : productButtons) {
+				Button button = (Button)productButton;
+				if (products.length > counter) {
+					Product product = productService.getProductByBarcode(products[counter]);
+					if (product != null) {
+						button.setText(product.getName());
+						button.setId(product.getCode());
+					}
+					
+					//set the first button to default one
+					if (counter==0) {
+						button.getStyleClass().add(Constants.CLICKED);
+						currentProduct.put(product.getCode(), product.getName());
+					}
+				}
+				counter++;
+			}//end for
+			
+			initializePriceButtons(products[0]);
+		}
+	}
+
+	private void initializePriceButtons(String productCode) {
+		String[] prices = configService.findListByName(Constants.SHORTCUT_PRICES + StringPool.COLON + productCode);
 		List<Node> priceButtons = priceGrid.getChildren();
 		int counter = 0;
 		for (Node priceButton : priceButtons) {
@@ -585,7 +615,7 @@ public class CheckoutController extends SimpleController {
 			counter++;
 		}//end for
 	}
-	
+
 	@FXML
 	public void addProductManually(ActionEvent event) {
 		if(!paymentInProcess) {

@@ -27,6 +27,9 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/Java SE 8 (MacOS X Default)"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="src/lib/jcl_sample.jar"/>
+	<classpathentry kind="lib" path="src/lib/jpos191-controls.jar"/>
+	<classpathentry kind="lib" path="src/lib/jcl.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

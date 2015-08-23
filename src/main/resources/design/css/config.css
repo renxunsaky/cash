@@ -1,0 +1,155 @@
+.configMain {
+	//-fx-background-color: #3C5B9A;
+	-fx-text-fill: #FFFFFF;
+}
+
+	.configMain TabPane .tabs {
+		-fx-background-color: #3C5B9A;
+		-fx-font-weight: bold;
+	}
+	
+		.configMain TabPane .tabs #userListPane {
+		}
+	
+			.configMain TabPane .tabs Label {
+				-fx-font-weight: bold;
+				-fx-font-size: 14px;
+				-fx-text-fill: #FFFFFF;
+			}
+			.configMain AnchorPane Label {
+				-fx-font-weight: bold;
+				-fx-font-size: 14px;
+			}
+
+	
+
+.header {
+	-fx-background-color: #0C5BBA;
+}
+	.header #modifyClientInfoButton {
+		-fx-background-color: #76C525;
+		-fx-text-fill: #FFFFFF;
+		-fx-font-weight: bold;
+	}
+
+.content {
+	-fx-background-color: #FFFFFF;
+}
+
+#leftPane {
+	-fx-border-width: 1px;
+	-fx-border-color: #0C5BBA;
+	-fx-border-style: solid;
+}
+	
+	#leftPane #functionalButtons {
+		-fx-background-color: #e6f2fb;
+	}
+		
+		#leftPane #functionalButtons Button {
+			-fx-text-fill: #000000;
+			-fx-font-size: 12px;
+			-fx-font-weight: bold;
+		}
+		
+		#leftPane #functionalButtons .commandButtons {
+			-fx-background-color: #e6f2fb;
+		}
+			#leftPane #functionalButtons .commandButtons Button {
+				-fx-background-color: #0C5BBA;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .commandButtons Button.orangeButton {
+				-fx-background-color: #F8B12C;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .commandButtons Button.redButton {
+				-fx-background-color: #FF241C;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .commandButtons Button.blueButton {
+				-fx-background-color: #2C9BEB;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .commandButtons Button.greenButton {
+				-fx-background-color: #76C525;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .commandButtons Button.navyButton {
+				-fx-background-color: #3C5B9A;
+				-fx-text-fill: #FFFFFF;
+			}
+		
+		#leftPane #functionalButtons .discountButtons {
+			-fx-background-color: #e6f2fb;
+		}
+			
+			#leftPane #functionalButtons .discountButtons Button {
+				-fx-background-color: #0C5BBA;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .discountButtons Button.orangeButton {
+				-fx-background-color: #F8B12C;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .discountButtons Button.redButton {
+				-fx-background-color: #FF241C;
+				-fx-text-fill: #FFFFFF;
+			}
+			#leftPane #functionalButtons .discountButtons Button.greenButton {
+				-fx-background-color: #76C525;
+				-fx-text-fill: #FFFFFF;
+			}
+
+#shortcutPane {
+	-fx-border-width: 1px;
+	-fx-border-color: #0C5BBA;
+	-fx-border-style: solid;
+}
+	#shortcutPane .clicked {
+		-fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.6) , 10, 0.5 , 0 , 0 );
+	}
+
+	#categoryGrid {
+		-fx-font-size: 10px;
+	}
+	
+		#categoryGrid Button {
+			-fx-background-color: #0C5BBA;
+			-fx-text-fill: #FFFFFF;
+		}
+		#categoryGrid Button.clicked {
+			-fx-background-color: #76C525;
+		}
+	
+	#productGrid {
+		-fx-font-size: 10px;
+	}
+		
+		#productGrid Button {
+			-fx-background-color: #3C5B9A;
+			-fx-text-fill: #FFFFFF;
+		}
+		#productGrid Button.clicked {
+			-fx-background-color: #2C9BEB;
+		}
+	
+	#priceGrid {
+		-fx-font-size: 10px;
+	}
+		
+		#priceGrid Button {
+			-fx-background-color: #5C6BAA;
+			-fx-text-fill: #FFFFFF;
+		}
+
+#calculatorPane {
+	-fx-border-width: 1px;
+	-fx-border-color: #2A715F;
+	-fx-border-style: solid;
+	-fx-background-color: #3C5B9A;
+}
+	
+	#calculatorPane Button {
+		-fx-font-weight: bold;
+	}

@@ -22,6 +22,7 @@ public interface Constants {
 	public static final String PAYMENT_MODE_CASH = "paymentCash";
 	public static final String PAYMENT_MODE_BANK_CARD = "paymentBankCard";
 	public static final String PAYMENT_MODE_GIFT_CARD = "paymentGiftCard";
+	public static final String SHORTCUT_PRODUCTS = "SHORTCUT_PRODUCTS";
 	public static final String SHORTCUT_PRICES = "SHORTCUT_PRICES";
 	public static final String CLICKED = "clicked";
 	public static final String STRICK_REDUCTION_ACTIVE = "STRICK_REDUCTION_ACTIVE";
