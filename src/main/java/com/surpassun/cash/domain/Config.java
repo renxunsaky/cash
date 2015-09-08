@@ -9,8 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * diverse configurations
  */
@@ -32,6 +30,15 @@ public class Config implements Serializable {
     
     @Size(min = 0, max = 500)
     private String description;
+    
+    public Config() {
+	}
+    
+    public Config(String name, String value, String description) {
+    	this.name = name;
+    	this.value = value;
+    	this.description = description;
+    }
 
 	public long getId() {
 		return id;

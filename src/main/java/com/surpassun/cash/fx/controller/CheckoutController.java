@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javafx.animation.Animation;
@@ -176,8 +175,6 @@ public class CheckoutController extends SimpleController {
 		//initialize configuration
 		strickModeOn = configService.findBoolean(Constants.STRICK_REDUCTION_ACTIVE);
 		strickReductions = configService.findFloatListByName(Constants.STRICK_REDUCTION_VALUE);
-		Locale locale = new Locale(configService.findByName(Constants.LOCALE));
-		CacheUtil.putCache(Constants.LOCALE, locale);
 		warnInfo.setText("");
 		
 		String adminPassword = configService.findByName(Constants.ADMIN_PASSWORD);

@@ -14,6 +14,9 @@ public class LanguageUtil {
 	private static void init() {
 		messageSource = new ReloadableResourceBundleMessageSource();
 		locale = (Locale)CacheUtil.getCache(Constants.LOCALE);
+		if (locale == null) {
+			CacheUtil.putCache(Constants.LOCALE, new Locale("Fr"));
+		}
 	}
 
 	public static String getMessage(String messageCode, Object... args) {

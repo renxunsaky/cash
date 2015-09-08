@@ -15,3 +15,31 @@
 #cancelButton {
 	-fx-color: #FFFFFF;
 }
+
+Button.orangeButton {
+	-fx-background-color: #F8B12C;
+	-fx-text-fill: #FFFFFF;
+}
+Button.redButton {
+	-fx-background-color: #FF241C;
+	-fx-text-fill: #FFFFFF;
+}
+Button.blueButton {
+	-fx-background-color: #2C9BEB;
+	-fx-text-fill: #FFFFFF;
+}
+Button.greenButton {
+	-fx-background-color: #76C525;
+	-fx-text-fill: #FFFFFF;
+}
+Button.navyButton {
+	-fx-background-color: #3C5B9A;
+	-fx-text-fill: #FFFFFF;
+}
+
+Label.errorInfo {
+	-fx-text-fill: #FF241C;
+}
+Label.successInfo {
+	-fx-text-fill: #76C525;
+}

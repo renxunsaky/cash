@@ -2,6 +2,8 @@ package com.surpassun.cash.fx.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
@@ -40,5 +42,12 @@ public class LoginController extends SimpleController {
 		}
 		
 		screenManager.showMainScreen();
+	}
+	
+	@FXML
+	public void doLogin(KeyEvent event) {
+		if (event.getCode() == KeyCode.ENTER) {
+			login();
+		}
 	}
 }

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import org.springframework.context.annotation.Configuration;
 
 import com.surpassun.cash.fx.controller.CheckoutController;
+import com.surpassun.cash.fx.controller.ConfigController;
 import com.surpassun.cash.fx.controller.LoginController;
 import com.surpassun.cash.fx.controller.MainController;
 
@@ -19,6 +20,8 @@ public class ScreenManager {
     private MainController mainController;
     @Inject
     private CheckoutController checkoutController;
+    @Inject
+    private ConfigController configController;
     
     private Stage stage;
     
@@ -36,5 +39,9 @@ public class ScreenManager {
 
 	public void showCheckout() {
 		checkoutController.show(stage);
+	}
+	
+	public void showConfiguration() {
+		configController.show(stage);
 	}
 }

@@ -41,6 +41,17 @@ public class User extends AbstractAuditingEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "login", referencedColumnName = "login")},
             inverseJoinColumns = {@JoinColumn(name = "name", referencedColumnName = "name")})
     private Set<Authority> authorities;
+    
+    public User() {
+    }
+    
+    public User(String login, String password, Boolean activated, String createdBy, String lastModifiedBy) {
+    	this.login = login;
+    	this.password = password;
+    	this.activated = activated;
+    	super.setCreatedBy(createdBy);
+    	super.setLastModifiedBy(lastModifiedBy);
+    }
 
     public String getLogin() {
         return login;
