@@ -22,36 +22,44 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 
-    @Size(min = 0, max = 100)
-    @NotNull
-    private String name;
+	@Size(min = 0, max = 100)
+	@NotNull
+	private String name;
 
-    @NotNull
-    private String code;
-    
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category", nullable = false)
-    private Category category;
-    
-    @NotNull
-    private float price;
-    
-    private Float discount;
-    
-    private Integer quantity;
+	@NotNull
+	private String code;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "category", nullable = false)
+	private Category category;
+
+	@NotNull
+	private float price;
+
+	private Float discount;
+
+	private Integer quantity;
 
 	public Product() {
 	}
-	
+
 	public Product(String categoryName, String barcode, String priceInfo) {
 		this.name = categoryName;
 		this.code = barcode;
 		this.price = Float.valueOf(priceInfo);
 		this.id = -1;
+	}
+
+	public Product(String name, String barcode, float price, Category category) {
+		this.name = name;
+		this.code = barcode;
+		this.price = price;
+		this.category = category;
+		super.setCreatedBy("1");
 	}
 
 	public long getId() {

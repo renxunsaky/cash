@@ -53,12 +53,12 @@ import com.surpassun.cash.util.StringPool;
 
 @Component
 public class CheckoutController extends SimpleController {
-	
+
 	private final Logger log = LoggerFactory.getLogger(CheckoutController.class);
-	
+
 	@Inject
 	private ProductService productService;
-	
+
 	/******* Properties for header *********/
 	@FXML
 	Label terminalInfo;
@@ -81,7 +81,7 @@ public class CheckoutController extends SimpleController {
 	private Float currentNumber;
 	private Float savedResult;
 	private String currentOperation;
-	
+
 	/******* Properties for payment method *********/
 	@FXML
 	Button paymentGiftCardButton;
@@ -90,7 +90,7 @@ public class CheckoutController extends SimpleController {
 	@FXML
 	Button paymentCashButton;
 	private boolean paymentInProcess;
-	
+
 	/******* Properties for article list *********/
 	@FXML
 	TableView<ArticleDto> articleList;
@@ -104,17 +104,16 @@ public class CheckoutController extends SimpleController {
 	Label totalPriceInfo;
 	@FXML
 	Label warnInfo;
-	
+
 	private float totalPrice;
 	private boolean strickModeOn;
 	private Float[] strickReductions;
-	
-	
+
 	/******* Properties for bar code scanner usage *********/
 	private StringBuilder currentBarcode;
 	private Map<String, Integer> barcodeList;
 	private GiftCardRepository giftCardRepository;
-	
+
 	/******* Properties for payment *********/
 	@FXML
 	Label toPay;
@@ -126,7 +125,7 @@ public class CheckoutController extends SimpleController {
 	private float receivedCash;
 	private float receivedBankCard;
 	private float receivedGiftCard;
-	
+
 	/******* Properties for shortcut buttons *********/
 	@FXML
 	GridPane categoryGrid;
@@ -136,22 +135,21 @@ public class CheckoutController extends SimpleController {
 	GridPane priceGrid;
 	private Map<String, String> currentCategory = new HashMap<String, String>();
 	private Map<String, String> currentProduct = new HashMap<String, String>();
-	
-	
+
 	public void show(Stage stage) {
 		super.show(this, stage, Constants.FXML_DESIGN_CHECKOUT);
 		init();
 	}
-	
+
 	/**
 	 * initialize top labels like client name, address, terminal number etc
 	 */
 	private void init() {
-		//initialize general properties
+		// initialize general properties
 		currentBarcode = new StringBuilder();
 		barcodeList = new HashMap<String, Integer>();
-		
-		//initialize terminal information
+
+		// initialize terminal information
 		String employeeName = SecurityContextHolder.getContext().getAuthentication().getName();
 		String terminalId = configService.findByName(Constants.TERMINAL_ID + StringPool.COLON + CashUtil.getCurrentMacAddress());
 		StringBuilder sb = new StringBuilder(terminalId).append(", ").append(employeeName);
@@ -166,30 +164,30 @@ public class CheckoutController extends SimpleController {
 		}));
 		timeLine.setCycleCount(Animation.INDEFINITE);
 		timeLine.play();
-		
-		//initialize article list
+
+		// initialize article list
 		articleName.setCellValueFactory(new PropertyValueFactory<>("displayName"));
 		articleOtherInfo.setCellValueFactory(new PropertyValueFactory<>("quantityInfo"));
 		articlePrice.setCellValueFactory(new PropertyValueFactory<>("priceInfo"));
-		
-		//initialize configuration
+
+		// initialize configuration
 		strickModeOn = configService.findBoolean(Constants.STRICK_REDUCTION_ACTIVE);
 		strickReductions = configService.findFloatListByName(Constants.STRICK_REDUCTION_VALUE);
 		warnInfo.setText("");
-		
+
 		String adminPassword = configService.findByName(Constants.ADMIN_PASSWORD);
 		CacheUtil.putCache(Constants.ADMIN_PASSWORD, adminPassword);
-		
-		//initialize shortcut buttons
+
+		// initialize shortcut buttons
 		List<Node> children = categoryGrid.getChildren();
 		List<Category> categories = categoryRepository.findAll();
 		for (int i = 0; i < categories.size(); i++) {
 			Category category = categories.get(i);
-			if(children.size() > i) {
-				Button node = (Button)children.get(i);
+			if (children.size() > i) {
+				Button node = (Button) children.get(i);
 				node.setText(category.getName());
 				node.setId(category.getCode());
-				//set the first button as the default selected one
+				// set the first button as the default selected one
 				if (i == 0) {
 					currentCategory.put(category.getCode(), category.getName());
 					node.getStyleClass().add(Constants.CLICKED);
@@ -197,14 +195,14 @@ public class CheckoutController extends SimpleController {
 					initializeShortcutButtons(category.getCode());
 				}
 			}
-		}//end for
+		}// end for
 	}
 
 	private String trim(String text) {
 		float result = Float.parseFloat(text);
 		return trim(result);
 	}
-	
+
 	private String trim(Float text) {
 		if (text == null) {
 			return "0";
@@ -216,10 +214,10 @@ public class CheckoutController extends SimpleController {
 			return Integer.toString(intPart);
 		}
 	}
-	
+
 	@FXML
 	public void handleDigitalKeys(ActionEvent event) {
-		String number = ((Button)event.getSource()).getText();
+		String number = ((Button) event.getSource()).getText();
 		if (currentNumber != null && currentOperation != null) {
 			savedResult = doOperation(currentOperation, savedResult != null ? savedResult : currentNumber, Float.parseFloat(number));
 		}
@@ -230,7 +228,7 @@ public class CheckoutController extends SimpleController {
 	public void handleOperationKeys(ActionEvent event) {
 		String text = calculatorResult.getText();
 		currentNumber = Float.parseFloat(text);
-		currentOperation = ((Button)event.getSource()).getText();
+		currentOperation = ((Button) event.getSource()).getText();
 		if (savedResult != null) {
 			calculatorResult.setText(trim(savedResult));
 			savedResult = null;
@@ -238,7 +236,7 @@ public class CheckoutController extends SimpleController {
 			calculatorResult.setText("");
 		}
 	}
-	
+
 	@FXML
 	public void handleEqual() {
 		String text = calculatorResult.getText();
@@ -248,44 +246,54 @@ public class CheckoutController extends SimpleController {
 		savedResult = null;
 		calculatorResult.setText(trim(currentNumber));
 	}
-	
+
 	private float doOperation(String operation, float firstNumber, float secondNumber) {
 		float result = 0F;
 		switch (currentOperation) {
-			case "+" : result = firstNumber + secondNumber; break;
-			case "-" : result = firstNumber - secondNumber; break;
-			case "*" : result = firstNumber * secondNumber; break;
-			case "/" : result = firstNumber / secondNumber; break;
-			default: break;
+		case "+":
+			result = firstNumber + secondNumber;
+			break;
+		case "-":
+			result = firstNumber - secondNumber;
+			break;
+		case "*":
+			result = firstNumber * secondNumber;
+			break;
+		case "/":
+			result = firstNumber / secondNumber;
+			break;
+		default:
+			break;
 		}
 		return result;
 	}
-	
+
 	@FXML
 	public void handleSpecialKeys(ActionEvent event) {
 		String text = calculatorResult.getText();
 		float newNumber = text != null ? Float.parseFloat(text) : 0F;
-		String operation = ((Button)event.getSource()).getText();
+		String operation = ((Button) event.getSource()).getText();
 		switch (operation) {
-			case "C" : 
-				currentNumber = null;
-				currentOperation = null;
-				savedResult = null;
-				break;
-			case "+/-" : 
-				currentNumber = -newNumber;
-				break;
-			case "%" :
-				currentNumber = newNumber/100;
-				break;
-			case "<=" : 
-				currentNumber = 0F; 
-				break;
-			default: break;
+		case "C":
+			currentNumber = null;
+			currentOperation = null;
+			savedResult = null;
+			break;
+		case "+/-":
+			currentNumber = -newNumber;
+			break;
+		case "%":
+			currentNumber = newNumber / 100;
+			break;
+		case "<=":
+			currentNumber = 0F;
+			break;
+		default:
+			break;
 		}
 		calculatorResult.setText(trim(currentNumber));
 	}
-	
+
 	@FXML
 	public void handleScannerInput(KeyEvent event) {
 		if (event.getCode() == KeyCode.ENTER) {
@@ -294,9 +302,8 @@ public class CheckoutController extends SimpleController {
 				Client client = clientRepository.findByCode(barcode);
 				if (client != null) {
 					StringBuilder clientInfoBuilder = new StringBuilder();
-					clientInfoBuilder.append(client.getCode()).append(", ").append(client.getFirstname()).append(" ").append(client.getLastname())
-						.append(", ").append(client.getAdress()).append(" ").append(client.getPostcode()).append(" ").append(client.getCity())
-						.append(", ").append(client.getPhone()).append(", ").append(client.getMembershipLevel().getName());
+					clientInfoBuilder.append(client.getCode()).append(", ").append(client.getFirstname()).append(" ").append(client.getLastname()).append(", ").append(client.getAdress()).append(" ")
+							.append(client.getPostcode()).append(" ").append(client.getCity()).append(", ").append(client.getPhone()).append(", ").append(client.getMembershipLevel().getName());
 					clientInfo.setText(clientInfoBuilder.toString());
 				} else {
 					log.warn("Cannot find client with code : {}", barcode);
@@ -310,8 +317,7 @@ public class CheckoutController extends SimpleController {
 					float toBePayed = totalPrice - receivedGiftCard - receivedBankCard - receivedCash;
 					boolean confirm = false;
 					if (giftCardBalance - toBePayed >= 0) {
-						confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
-								LanguageUtil.getMessage("ui.popup.giftcard.header", toBePayed),
+						confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"), LanguageUtil.getMessage("ui.popup.giftcard.header", toBePayed),
 								LanguageUtil.getMessage("ui.popup.confirmation.content"));
 						if (confirm) {
 							receivedGiftCard += toBePayed;
@@ -320,8 +326,7 @@ public class CheckoutController extends SimpleController {
 						}
 					} else {
 						confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
-								LanguageUtil.getMessage("ui.popup.giftcard.header.balance.not.enough", toBePayed),
-								LanguageUtil.getMessage("ui.popup.confirmation.content.use.left", giftCardBalance));
+								LanguageUtil.getMessage("ui.popup.giftcard.header.balance.not.enough", toBePayed), LanguageUtil.getMessage("ui.popup.confirmation.content.use.left", giftCardBalance));
 						if (confirm) {
 							receivedGiftCard += giftCardBalance;
 							toBePayed -= giftCardBalance;
@@ -331,14 +336,14 @@ public class CheckoutController extends SimpleController {
 					if (confirm) {
 						StringBuilder sb = new StringBuilder().append(String.format("%.2f", toBePayed)).append(StringPool.SPACE).append(StringPool.EURO);
 						updateLabel(toPay, sb);
-						
+
 						StringBuilder sb1 = new StringBuilder().append(String.format("%.2f", totalPrice - toBePayed)).append(StringPool.SPACE).append(StringPool.EURO);
 						updateLabel(received, sb1);
 					}
 				}
 			} else if (StringUtils.isNotBlank(barcode)) {
 				if (!paymentInProcess) {
-					//search barcode in database and display it on the screen
+					// search barcode in database and display it on the screen
 					Product product = productService.getProductByBarcode(barcode);
 					if (product != null) {
 						addProduct(barcode, product);
@@ -349,8 +354,8 @@ public class CheckoutController extends SimpleController {
 					}
 				}
 			}
-			
-			//clear barcode buffer
+
+			// clear barcode buffer
 			currentBarcode = new StringBuilder();
 		} else if (event.getCode().isDigitKey()) {
 			currentBarcode.append(event.getText());
@@ -379,20 +384,18 @@ public class CheckoutController extends SimpleController {
 			}
 		}
 	}
-	
+
 	@FXML
 	public void decreaseQuantity() {
 		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
 		if (articleDto != null) {
 			int quantity = barcodeList.get(articleDto.getCode());
 			if (!paymentInProcess && quantity > 1) {
-				String password = CashUtil.createInputPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
-						LanguageUtil.getMessage("ui.popup.require.password"),
+				String password = CashUtil.createInputPopup(LanguageUtil.getMessage("ui.title.common.confirmation"), LanguageUtil.getMessage("ui.popup.require.password"),
 						LanguageUtil.getMessage("ui.popup.enter.password"));
 				if (CacheUtil.getCache(Constants.ADMIN_PASSWORD).equals(password)) {
-					auditService.addAudit(StringUtils.substringBefore(terminalInfo.getText(), StringPool.COMMA),
-							StringUtils.substringAfter(terminalInfo.getText(), StringPool.COMMA),
-							articleDto, Constants.OPERATION_TYPE_DECREASE_QUANTITY);
+					auditService.addAudit(StringUtils.substringBefore(terminalInfo.getText(), StringPool.COMMA), StringUtils.substringAfter(terminalInfo.getText(), StringPool.COMMA), articleDto,
+							Constants.OPERATION_TYPE_DECREASE_QUANTITY);
 					changeQuantity(false);
 				} else {
 					warnInfo.setText(LanguageUtil.getMessage("ui.label.warn.admin.password.incorrect"));
@@ -401,7 +404,7 @@ public class CheckoutController extends SimpleController {
 			}
 		}
 	}
-	
+
 	private void changeQuantity(boolean isIncrease) {
 		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
 		if (articleDto != null) {
@@ -417,19 +420,18 @@ public class CheckoutController extends SimpleController {
 			}
 		}
 	}
-	
+
 	@FXML
 	public void deleteCurrentSelection() {
 		if (!paymentInProcess) {
-			String password = CashUtil.createInputPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
-					LanguageUtil.getMessage("ui.popup.require.password"),
+			String password = CashUtil.createInputPopup(LanguageUtil.getMessage("ui.title.common.confirmation"), LanguageUtil.getMessage("ui.popup.require.password"),
 					LanguageUtil.getMessage("ui.popup.enter.password"));
 			if (CacheUtil.getCache(Constants.ADMIN_PASSWORD).equals(password)) {
 				ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
 				if (articleDto != null) {
-					auditService.addAudit(StringUtils.substringBefore(terminalInfo.getText(), StringPool.COMMA),
-							StringUtils.substringAfter(terminalInfo.getText(), StringPool.COMMA), articleDto, Constants.OPERATION_TYPE_DELETE);
-					
+					auditService.addAudit(StringUtils.substringBefore(terminalInfo.getText(), StringPool.COMMA), StringUtils.substringAfter(terminalInfo.getText(), StringPool.COMMA), articleDto,
+							Constants.OPERATION_TYPE_DELETE);
+
 					articleList.getItems().remove(articleDto);
 					updateTotalPrice(articleList.getItems());
 					barcodeList.remove(articleDto.getCode());
@@ -440,7 +442,7 @@ public class CheckoutController extends SimpleController {
 			}
 		}
 	}
-	
+
 	private void updateTotalPrice(ObservableList<ArticleDto> items) {
 		totalPrice = 0;
 		for (ArticleDto article : items) {
@@ -450,55 +452,54 @@ public class CheckoutController extends SimpleController {
 		sb.append(String.format("%.2f", totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
 		updateLabel(totalPriceInfo, sb);
 	}
-	
-	
+
 	@FXML
 	public void beginPayment() {
 		paymentInProcess = true;
-		//display total to pay, received information
+		// display total to pay, received information
 		StringBuilder sb = new StringBuilder().append(String.format("%.2f", totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
 		updateLabel(toPay, sb);
-		
+
 		updateLabel(received, null);
 	}
-	
+
 	@FXML
 	public void cancelPayment() {
 		paymentInProcess = false;
-		//reset payment information
+		// reset payment information
 		receivedBankCard = 0F;
 		receivedCash = 0F;
 		receivedGiftCard = 0F;
-		
+
 		updateLabel(toPay, null);
 		updateLabel(received, null);
 		updateLabel(toReturn, null);
-		
+
 		currentPaymentMode = null;
 		paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
 		paymentBankCardButton.getStyleClass().remove(Constants.CLICKED);
 		paymentCashButton.getStyleClass().remove(Constants.CLICKED);
 	}
-	
+
 	@FXML
 	public void setPaymentMethod(ActionEvent event) {
 		if (paymentInProcess) {
 			paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
 			paymentBankCardButton.getStyleClass().remove(Constants.CLICKED);
 			paymentCashButton.getStyleClass().remove(Constants.CLICKED);
-			
-			Button clickedButton = (Button)event.getSource();
+
+			Button clickedButton = (Button) event.getSource();
 			clickedButton.getStyleClass().add(Constants.CLICKED);
-			
+
 			currentPaymentMode = clickedButton.getId();
 			if (Constants.PAYMENT_MODE_BANK_CARD.equals(currentPaymentMode)) {
-				//TODO: propose bank card payment terminal
+				// TODO: propose bank card payment terminal
 			} else {
 				calculatorResult.clear();
 			}
 		}
 	}
-	
+
 	@FXML
 	public void handlePayment() {
 		if (paymentInProcess) {
@@ -510,7 +511,7 @@ public class CheckoutController extends SimpleController {
 				StringBuilder sb = new StringBuilder();
 				sb.append(totalReceived).append(StringPool.SPACE).append(StringPool.EURO);
 				updateLabel(received, sb);
-				
+
 				StringBuilder toReturn = new StringBuilder();
 				toReturn.append(String.format("%.2f", totalReceived - totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
 				updateLabel(this.toReturn, toReturn);
@@ -518,19 +519,19 @@ public class CheckoutController extends SimpleController {
 			}
 		}
 	}
-	
+
 	@FXML
 	public void printTicket() {
-		//TODO: print ticket
+		// TODO: print ticket
 	}
-	
+
 	@FXML
 	public void handleDiscount(ActionEvent event) {
 		if (!paymentInProcess) {
-			Button clickedButton = (Button)event.getSource();
+			Button clickedButton = (Button) event.getSource();
 			String text = clickedButton.getText();
 			String discount = StringUtils.substringBefore(text, StringPool.PERCENT);
-			
+
 			ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
 			if (articleDto != null) {
 				articleDto.correctInfo(discount);
@@ -541,61 +542,61 @@ public class CheckoutController extends SimpleController {
 			}
 		}
 	}
-	
-	@FXML	
+
+	@FXML
 	public void handleCategoryChange(ActionEvent event) {
 		List<Node> children = categoryGrid.getChildren();
 		for (Node node : children) {
 			node.getStyleClass().remove(Constants.CLICKED);
 		}
 		currentCategory.clear();
-		Button clickedButton = (Button)event.getSource();
+		Button clickedButton = (Button) event.getSource();
 		clickedButton.getStyleClass().add(Constants.CLICKED);
 		String categoryCode = clickedButton.getId();
 		currentCategory.put(categoryCode, clickedButton.getText());
-		
+
 		initializeShortcutButtons(categoryCode);
 	}
-	
-	@FXML	
+
+	@FXML
 	public void handleProductChange(ActionEvent event) {
 		List<Node> children = productGrid.getChildren();
 		for (Node node : children) {
 			node.getStyleClass().remove(Constants.CLICKED);
 		}
 		currentProduct.clear();
-		Button clickedButton = (Button)event.getSource();
+		Button clickedButton = (Button) event.getSource();
 		clickedButton.getStyleClass().add(Constants.CLICKED);
 		String productCode = clickedButton.getId();
 		currentProduct.put(productCode, clickedButton.getText());
-		
+
 		initializePriceButtons(productCode);
 	}
 
 	private void initializeShortcutButtons(String categoryCode) {
 		String[] products = configService.findListByName(Constants.SHORTCUT_PRODUCTS + StringPool.COLON + categoryCode);
-		
+
 		if (products != null && products.length > 0) {
 			List<Node> productButtons = productGrid.getChildren();
 			int counter = 0;
 			for (Node productButton : productButtons) {
-				Button button = (Button)productButton;
+				Button button = (Button) productButton;
 				if (products.length > counter) {
 					Product product = productService.getProductByBarcode(products[counter]);
 					if (product != null) {
 						button.setText(product.getName());
 						button.setId(product.getCode());
 					}
-					
-					//set the first button to default one
-					if (counter==0) {
+
+					// set the first button to default one
+					if (counter == 0) {
 						button.getStyleClass().add(Constants.CLICKED);
 						currentProduct.put(product.getCode(), product.getName());
 					}
 				}
 				counter++;
-			}//end for
-			
+			}// end for
+
 			initializePriceButtons(products[0]);
 		}
 	}
@@ -605,55 +606,57 @@ public class CheckoutController extends SimpleController {
 		List<Node> priceButtons = priceGrid.getChildren();
 		int counter = 0;
 		for (Node priceButton : priceButtons) {
-			Button button = (Button)priceButton;
+			Button button = (Button) priceButton;
 			if (prices.length > counter) {
 				button.setText(prices[counter]);
 			}
 			counter++;
-		}//end for
+		}// end for
 	}
 
 	@FXML
 	public void addProductManually(ActionEvent event) {
-		if(!paymentInProcess) {
-			Button priceButton = (Button)event.getSource();
+		if (!paymentInProcess) {
+			Button priceButton = (Button) event.getSource();
 			String categoryCode = currentCategory.keySet().iterator().next();
 			String barcode = categoryCode + StringPool.COLON + priceButton.getText();
-			
+
 			Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
 			addProduct(barcode, product);
 		}
 	}
-	
+
 	private void addProduct(String barcode, Product product) {
 		int scannedNumber = articleList.getItems().size();
 		Float strickDiscount = null;
 		if (strickModeOn && strickReductions.length > scannedNumber) {
 			strickDiscount = strickReductions[scannedNumber];
 		}
-		
+
 		Integer quantity = 1;
 		if (barcodeList.containsKey(barcode)) {
 			quantity = barcodeList.get(barcode) + 1;
 		}
-		//If strick mode is on, and they are the first three products, do not add them to the map
+		// If strick mode is on, and they are the first three products, do not
+		// add them to the map
 		if (strickDiscount == null) {
 			barcodeList.put(barcode, quantity);
 		} else {
 			barcodeList.put(barcode + ":" + strickDiscount, quantity);
 		}
 		ArticleDto articleDto = new ArticleDto(product, quantity, strickDiscount);
-		//the equals method of ArticleDto is overridden, so it is secure to do like this
+		// the equals method of ArticleDto is overridden, so it is secure to do
+		// like this
 		int index = articleList.getItems().indexOf(articleDto);
 		if (index != -1 && strickDiscount == null) {
 			articleList.getItems().set(index, articleDto);
 		} else {
 			articleList.getItems().add(articleDto);
 		}
-		
+
 		updateTotalPrice(articleList.getItems());
 	}
-	
+
 	private void updateLabel(Label label, StringBuilder value) {
 		String text = StringUtils.substringBefore(label.getText(), StringPool.COLON);
 		StringBuilder sb = new StringBuilder(text).append(StringPool.COLON).append(StringPool.SPACE).append(value != null ? value : "");

@@ -3,27 +3,34 @@ server:
 
 spring:
     profiles: dev
-    
+
     datasource:
-        dataSourceClassName: org.h2.jdbcx.JdbcDataSource
-        url: jdbc:h2:mem:cash
-        databaseName: 
-        serverName: 
-        username: 
-        password: 
+        dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+        #driverClassName: com.mysql.jdbc.Driver
+        #jdbcUrl: jdbc:mysql://localhost:3306/cash
+        url: jdbc:mysql://localhost:3306/cash
+        databaseName:
+        serverName:
+        username: cash
+        password: cash
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
 
     jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
-        database: H2
+        database-platform: org.hibernate.dialect.MySQL5Dialect
+        #database: H2
+        database: MySQL
         openInView: false
         show_sql: true
-        generate-ddl: false
+        generate-ddl: true
         hibernate:
             ddl-auto: create-drop
             naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
         properties:
             hibernate.cache.use_second_level_cache: true
-            hibernate.cache.use_query_cache: false
+            hibernate.cache.use_query_cache: true
             hibernate.generate_statistics: true
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
 

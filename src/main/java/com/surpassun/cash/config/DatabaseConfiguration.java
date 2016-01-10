@@ -48,7 +48,9 @@ public class DatabaseConfiguration implements EnvironmentAware {
             throw new ApplicationContextException("Database connection pool is not configured correctly");
         }
         HikariConfig config = new HikariConfig();
+        //config.setDriverClassName(propertyResolver.getProperty("driverClassName"));
         config.setDataSourceClassName(propertyResolver.getProperty("dataSourceClassName"));
+        //config.setJdbcUrl(propertyResolver.getProperty("jdbcUrl"));
         if (propertyResolver.getProperty("url") == null || "".equals(propertyResolver.getProperty("url"))) {
             config.addDataSourceProperty("databaseName", propertyResolver.getProperty("databaseName"));
             config.addDataSourceProperty("serverName", propertyResolver.getProperty("serverName"));
