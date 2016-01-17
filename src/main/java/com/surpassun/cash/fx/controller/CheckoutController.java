@@ -103,10 +103,14 @@ public class CheckoutController extends SimpleController {
 	@FXML
 	Label totalPriceInfo;
 	@FXML
+	Label payableByCouponInfo;
+	@FXML
 	Label warnInfo;
 
 	private float totalPrice;
+	private float payableByCoupon;
 	private boolean strickModeOn;
+	private boolean discountCouponForAll;
 	private Float[] strickReductions;
 
 	/******* Properties for bar code scanner usage *********/
@@ -171,6 +175,7 @@ public class CheckoutController extends SimpleController {
 		articlePrice.setCellValueFactory(new PropertyValueFactory<>("priceInfo"));
 
 		// initialize configuration
+		discountCouponForAll = configService.findBoolean(Constants.DISCOUNT_COUPON_FOR_ALL);
 		strickModeOn = configService.findBoolean(Constants.STRICK_REDUCTION_ACTIVE);
 		strickReductions = configService.findFloatListByName(Constants.STRICK_REDUCTION_VALUE);
 		warnInfo.setText("");
@@ -364,7 +369,8 @@ public class CheckoutController extends SimpleController {
 
 	@FXML
 	public void increaseQuantity() {
-		if (!paymentInProcess) {
+		ArticleDto articleDto = articleList.getSelectionModel().getSelectedItem();
+		if (articleDto != null && !paymentInProcess) {
 			int scannedNumber = articleList.getItems().size();
 			Float strickDiscount = null;
 			if (strickModeOn && strickReductions.length > scannedNumber) {
@@ -444,9 +450,16 @@ public class CheckoutController extends SimpleController {
 	}
 
 	private void updateTotalPrice(ObservableList<ArticleDto> items) {
-		totalPrice = 0;
+		totalPrice = 0F;
+		payableByCoupon = 0F;
 		for (ArticleDto article : items) {
 			totalPrice += article.getRealPrice();
+			if (article.getDiscount() == null || article.getDiscount().equals(0F)) {
+				payableByCoupon += article.getRealPrice();
+			}
+		}
+		if (discountCouponForAll) {
+			payableByCoupon = totalPrice;
 		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("%.2f", totalPrice)).append(StringPool.SPACE).append(StringPool.EURO);
@@ -461,6 +474,10 @@ public class CheckoutController extends SimpleController {
 		updateLabel(toPay, sb);
 
 		updateLabel(received, null);
+		
+		//display the amount payable by discount coupon
+		StringBuilder sb2 = new StringBuilder().append(String.format("%.2f", payableByCoupon)).append(StringPool.SPACE).append(StringPool.EURO);
+		updateLabel(payableByCouponInfo, sb2);
 	}
 
 	@FXML
@@ -470,10 +487,12 @@ public class CheckoutController extends SimpleController {
 		receivedBankCard = 0F;
 		receivedCash = 0F;
 		receivedGiftCard = 0F;
+		payableByCoupon = 0F;
 
 		updateLabel(toPay, null);
 		updateLabel(received, null);
 		updateLabel(toReturn, null);
+		updateLabel(payableByCouponInfo, null);
 
 		currentPaymentMode = null;
 		paymentGiftCardButton.getStyleClass().remove(Constants.CLICKED);
@@ -547,7 +566,7 @@ public class CheckoutController extends SimpleController {
 	public void handleCategoryChange(ActionEvent event) {
 		List<Node> children = categoryGrid.getChildren();
 		for (Node node : children) {
-			node.getStyleClass().remove(Constants.CLICKED);
+			node.getStyleClass().removeAll(Constants.CLICKED);
 		}
 		currentCategory.clear();
 		Button clickedButton = (Button) event.getSource();
@@ -562,7 +581,7 @@ public class CheckoutController extends SimpleController {
 	public void handleProductChange(ActionEvent event) {
 		List<Node> children = productGrid.getChildren();
 		for (Node node : children) {
-			node.getStyleClass().remove(Constants.CLICKED);
+			node.getStyleClass().removeAll(Constants.CLICKED);
 		}
 		currentProduct.clear();
 		Button clickedButton = (Button) event.getSource();
@@ -586,6 +605,7 @@ public class CheckoutController extends SimpleController {
 					if (product != null) {
 						button.setText(product.getName());
 						button.setId(product.getCode());
+						button.getStyleClass().removeAll(Constants.CLICKED);
 					}
 
 					// set the first button to default one

@@ -74,6 +74,8 @@ public class ConfigController extends SimpleController {
 	@FXML
 	CheckBox discountActive;
 	@FXML
+	CheckBox discountCouponForAll;
+	@FXML
 	TextField firstProductDiscount;
 	@FXML
 	TextField secondProductDiscount;
@@ -209,9 +211,6 @@ public class ConfigController extends SimpleController {
 				return;
 			}
 		}
-		float firstDiscount = Float.parseFloat(firstProductDiscount.getText());
-		float secondDiscount = Float.parseFloat(secondProductDiscount.getText());
-		float thirdDiscount = Float.parseFloat(thirdProductDiscount.getText());
 		Config discountActiveConfig = configRepository.findByName(Constants.STRICK_REDUCTION_ACTIVE);
 		if (discountActiveConfig == null) {
 			discountActiveConfig = new Config(Constants.STRICK_REDUCTION_ACTIVE, Boolean.toString(isDiscountActive), null);
@@ -221,16 +220,30 @@ public class ConfigController extends SimpleController {
 		configRepository.save(discountActiveConfig);
 		log.info("Discount active config value set to : {}", isDiscountActive);
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(firstDiscount).append(StringPool.SEMICOLON).append(secondDiscount).append(StringPool.SEMICOLON).append(thirdDiscount);
-		Config discountValueConfig = configRepository.findByName(Constants.STRICK_REDUCTION_VALUE);
-		if (discountValueConfig == null) {
-			discountValueConfig = new Config(Constants.STRICK_REDUCTION_VALUE, sb.toString(), null);
-		} else {
-			discountValueConfig.setValue(sb.toString());
+		if (isDiscountActive) {
+			float firstDiscount = Float.parseFloat(firstProductDiscount.getText());
+			float secondDiscount = Float.parseFloat(secondProductDiscount.getText());
+			float thirdDiscount = Float.parseFloat(thirdProductDiscount.getText());
+			StringBuilder sb = new StringBuilder();
+			sb.append(firstDiscount).append(StringPool.SEMICOLON).append(secondDiscount).append(StringPool.SEMICOLON).append(thirdDiscount);
+			Config discountValueConfig = configRepository.findByName(Constants.STRICK_REDUCTION_VALUE);
+			if (discountValueConfig == null) {
+				discountValueConfig = new Config(Constants.STRICK_REDUCTION_VALUE, sb.toString(), null);
+			} else {
+				discountValueConfig.setValue(sb.toString());
+			}
+			configRepository.save(discountValueConfig);
+			log.info("Discount config value set to : {}", sb.toString());
 		}
-		configRepository.save(discountValueConfig);
-		log.info("Discount config value set to : {}", sb.toString());
+		
+		boolean isDiscountCouponForAll = discountCouponForAll.isSelected();
+		Config discountCouponForAllConfig = configRepository.findByName(Constants.DISCOUNT_COUPON_FOR_ALL);
+		if (discountCouponForAllConfig == null) {
+			discountCouponForAllConfig = new Config(Constants.DISCOUNT_COUPON_FOR_ALL, Boolean.toString(isDiscountCouponForAll), null);
+		}
+		discountCouponForAllConfig.setValue(Boolean.toString(isDiscountCouponForAll));
+		configRepository.save(discountCouponForAllConfig);
+		log.info("Discount coupon is usable for all products value set to : {}", isDiscountCouponForAll);
 
 		saveDiscountSuccessInfo.setText(LanguageUtil.getMessage("ui.label.success.save.discount.config"));
 		CashUtil.makeFadeOutAnimation(5000, saveDiscountSuccessInfo);

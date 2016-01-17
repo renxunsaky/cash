@@ -36,6 +36,8 @@ public class OperationAudit extends AbstractAuditingEntity implements Serializab
 	public OperationAudit(String terminalId, String user, String productCode,
 			String operationType, float unitPrice, float realPrice) {
 		super();
+		super.setCreatedBy("1");
+		super.setLastModifiedBy("1");
 		this.terminalId = terminalId;
 		this.user = user;
 		this.productCode = productCode;

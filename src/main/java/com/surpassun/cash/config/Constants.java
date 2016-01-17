@@ -28,6 +28,7 @@ public interface Constants {
 	public static final String CLICKED = "clicked";
 	public static final String STRICK_REDUCTION_ACTIVE = "STRICK_REDUCTION_ACTIVE";
 	public static final String STRICK_REDUCTION_VALUE = "STRICK_REDUCTION_VALUE";
+	public static final String DISCOUNT_COUPON_FOR_ALL = "DISCOUNT_COUPON_FOR_ALL";
 	public static final String LOCALE = "LOCALE";
 	public static final String ADMIN_PASSWORD = "ADMIN_PASSWORD";
 	public static final String OPERATION_TYPE_DECREASE_QUANTITY = "DECREASE";

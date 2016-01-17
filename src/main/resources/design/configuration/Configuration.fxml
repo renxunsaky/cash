@@ -71,6 +71,7 @@
                         <Button layoutX="409.0" layoutY="319.0" mnemonicParsing="false" onAction="#saveDiscountConfig" prefHeight="40.0" styleClass="greenButton" text="%ui.button.config.button.discount.submit" AnchorPane.leftAnchor="330.0" AnchorPane.rightAnchor="330.0" />
                         <Label fx:id="discountValueWarnInfo" alignment="CENTER" contentDisplay="CENTER" layoutX="384.0" layoutY="274.0" styleClass="errorInfo" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" />
                         <Label fx:id="saveDiscountSuccessInfo" alignment="CENTER" contentDisplay="CENTER" layoutX="268.0" layoutY="39.0" prefHeight="18.0" prefWidth="0.0" styleClass="successInfo" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" />
+                        <CheckBox fx:id="discountCouponForAll" layoutX="290.0" layoutY="267.0" mnemonicParsing="false" text="%ui.button.config.label.discount.for.all.products" />
                      </children></AnchorPane>
             </content>
           </Tab>

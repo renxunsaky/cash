@@ -46,7 +46,7 @@ public class ArticleDto {
 				.append(StringPool.RETURN_NEW_LINE)
 				.append(StringPool.MINUS).append(String.format("%.0f", (discount * 100))).append(StringPool.PERCENT)
 				.append(StringPool.RETURN_NEW_LINE)
-				.append((String.format("%.0f", (1- discount) * originalPrice))).append(StringPool.EURO);
+				.append((String.format("%.2f", (1- discount) * originalPrice))).append(StringPool.EURO);
 			realPrice = (1- discount) * originalPrice;
 			this.priceInfo = sb.toString();
 		} else {

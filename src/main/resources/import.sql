@@ -27,6 +27,7 @@ insert into T_CONFIG(id, name, value, description) values(11, 'STRICK_REDUCTION_
 insert into T_CONFIG(id, name, value, description) values(12, 'STRICK_REDUCTION_VALUE', '0;0.2;0.3', null);
 insert into T_CONFIG(id, name, value, description) values(13, 'LOCALE', 'FR', null);
 insert into T_CONFIG(id, name, value, description) values(14, 'ADMIN_PASSWORD', 'admin', null);
+insert into T_CONFIG(id, name, value, description) values(15, 'DISCOUNT_COUPON_FOR_ALL', 'false', null);
 
 
 

@@ -33,7 +33,7 @@
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Label>
-      			      <Label layoutX="20.0" layoutY="45.0" prefHeight="16.0" prefWidth="92.0" text="%ui.label.checkout.article.list">
+      			      <Label layoutX="20.0" layoutY="45.0" prefHeight="16.0" prefWidth="200.0" text="%ui.label.checkout.article.list">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font></Label>
@@ -45,7 +45,7 @@
                             <TableColumn fx:id="articlePrice" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="150.0" sortable="false" text="%ui.table.checkout.header.price" />
                           </columns>
                         </TableView>
-                  <AnchorPane prefHeight="60.0" prefWidth="440.0" AnchorPane.bottomAnchor="277.0">
+                  <AnchorPane prefHeight="80.0" prefWidth="440.0" AnchorPane.bottomAnchor="257.0">
                      <children>
                               <Label fx:id="totalPriceInfo" prefHeight="25.0" prefWidth="150.0" text="%ui.label.checkout.total.price" AnchorPane.leftAnchor="20.0">
                                  <font>
@@ -67,6 +67,11 @@
                                     <Font name="System Bold" size="14.0" />
                                  </font>
                               </Label>
+                        <Label fx:id="payableByCouponInfo" layoutX="20.0" layoutY="25.0" prefHeight="25.0" prefWidth="400.0" text="%ui.label.checkout.payable.coupon" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="20.0">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
                      </children>
                   </AnchorPane>
                         <AnchorPane id="functionalButtons" prefHeight="259.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0">
@@ -98,7 +103,7 @@
                                        </font>
                                     </Button>
                                     <Button layoutX="14.0" layoutY="54.0" mnemonicParsing="false" onAction="#increaseQuantity" prefHeight="50.0" prefWidth="120.0" styleClass="navyButton" text="Quantité +" AnchorPane.leftAnchor="14.0" GridPane.rowIndex="1" />
-                                    <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="120.0" text="Reprendre Ticket" AnchorPane.leftAnchor="14.0" />
+                                    <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="122.0" text="Reprendre Ticket" AnchorPane.leftAnchor="14.0" />
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
