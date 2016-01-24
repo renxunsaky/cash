@@ -2,9 +2,11 @@ package com.surpassun.cash.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -24,7 +26,7 @@ public class ExcelImportUtil {
 	private static final HSSFDataFormatter formatter = new HSSFDataFormatter();
 	private static final Map<String, Category> categoryInfos = new HashMap<String, Category>();
 
-	public static List<Product> workbookToProducts(HSSFSheet sheet, CategoryRepository categoryRepository, List<Integer> errorLines) {
+	public static Set<Product> workbookToProducts(HSSFSheet sheet, CategoryRepository categoryRepository, List<Integer> errorLines) {
 		if (sheet != null) {
 			List<Category> categories = categoryRepository.findAll();
 			if (categories == null) {
@@ -36,7 +38,8 @@ public class ExcelImportUtil {
 			}
 			Iterator<Row> it = sheet.rowIterator();
 			int counter = 0;
-			List<Product> products = new ArrayList<Product>();
+			Set<Product> products = new HashSet<Product>();
+			
 			Row row = null;
 			while (it.hasNext()) {
 				row = it.next();
@@ -44,7 +47,12 @@ public class ExcelImportUtil {
 					try {
 						Product product = extractAndConstructObject(categoryInfos, categoryRepository, row);
 						if (product != null) {
-							products.add(product);
+							if (!products.contains(product)) {
+								products.add(product);
+							} else {
+								log.error("Duplicate product code {} at line {}", product.getCode(), row.getRowNum());
+								errorLines.add(row.getRowNum());
+							}
 						}
 					} catch (Exception e) {
 						log.error("Error while constructing object", e);
@@ -71,11 +79,12 @@ public class ExcelImportUtil {
 			String value = formatter.formatCellValue(cell);
 			int index = cell.getColumnIndex();
 			if (index == 0) {
-				productName = StringUtils.trim(value);
+				productName = StringUtils.lowerCase(StringUtils.trim(value));
 			} else if (index == 1) {
 				productCode = StringUtils.trim(value);
 			} else if (index == 3) {
-				categoryName = StringUtils.trim(value);
+				//save always the category name in lower case
+				categoryName = StringUtils.lowerCase(StringUtils.trim(value));
 			} else if (index == 5) {
 				priceText = StringUtils.trim(value);
 			}
@@ -84,7 +93,8 @@ public class ExcelImportUtil {
 		if (!categories.containsKey(categoryName)) {
 			Category category = new Category();
 			category.setName(categoryName);
-			String categoryCode = StringUtils.substring(productCode, 0, 2);
+			//String categoryCode = StringUtils.substring(productCode, 0, 2);
+			String categoryCode = categoryName;
 			category.setCode(categoryCode);
 			categoryRepository.save(category);
 			categories.put(categoryName, category);

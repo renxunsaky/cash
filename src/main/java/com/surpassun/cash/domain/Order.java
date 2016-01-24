@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  * Orders
  */
 @Entity
-@Table(name = "T_ORDER")
+@Table(name = "ORDER")
 public class Order extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

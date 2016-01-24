@@ -2,6 +2,7 @@ package com.surpassun.cash.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -12,7 +13,7 @@ import javax.validation.constraints.Size;
  * Category of products.
  */
 @Entity
-@Table(name = "T_CATEGORY")
+@Table(name = "CATEGORY")
 public class Category implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -23,6 +24,7 @@ public class Category implements Serializable {
     private String name;
 
     @Size(min = 0, max = 100)
+    @Column(unique = true)
     private String code;
 
     private Float discount;

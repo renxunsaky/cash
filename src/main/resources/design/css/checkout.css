@@ -92,6 +92,7 @@
 		#categoryGrid Button {
 			-fx-background-color: #0C5BBA;
 			-fx-text-fill: #FFFFFF;
+			-fx-text-transform: capitalize;
 		}
 		#categoryGrid Button.clicked {
 			-fx-background-color: #76C525;
@@ -104,6 +105,7 @@
 		#productGrid Button {
 			-fx-background-color: #3C5B9A;
 			-fx-text-fill: #FFFFFF;
+			-fx-text-transform: capitalize;
 		}
 		#productGrid Button.clicked {
 			-fx-background-color: #2C9BEB;

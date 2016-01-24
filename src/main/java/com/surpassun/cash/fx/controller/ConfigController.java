@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,6 +43,7 @@ import com.surpassun.cash.repository.CategoryRepository;
 import com.surpassun.cash.repository.ConfigRepository;
 import com.surpassun.cash.repository.ProductRepository;
 import com.surpassun.cash.repository.UserRepository;
+import com.surpassun.cash.service.ConfigService;
 import com.surpassun.cash.util.CashUtil;
 import com.surpassun.cash.util.ExcelImportUtil;
 import com.surpassun.cash.util.LanguageUtil;
@@ -71,6 +73,7 @@ public class ConfigController extends SimpleController {
 	/* Discount configuration */
 	@Inject
 	private ConfigRepository configRepository;
+	@Inject ConfigService configService;
 	@FXML
 	CheckBox discountActive;
 	@FXML
@@ -264,7 +267,7 @@ public class ConfigController extends SimpleController {
 				if (workbook != null) {
 					HSSFSheet sheet = workbook.getSheetAt(0);
 					List<Integer> errorLines = new ArrayList<Integer>();
-					List<Product> products = ExcelImportUtil.workbookToProducts(sheet, categoryRepository, errorLines);
+					Set<Product> products = ExcelImportUtil.workbookToProducts(sheet, categoryRepository, errorLines);
 					if (errorLines.size() > 0) {
 						StringBuilder sb = new StringBuilder();
 						for (Integer errorLineNumber : errorLines) {
@@ -273,27 +276,18 @@ public class ConfigController extends SimpleController {
 						boolean confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
 								LanguageUtil.getMessage("ui.popup.import.header"), LanguageUtil.getMessage("ui.popup.import.content", sb.toString()));
 						if (confirm) {
-							if (products != null) {
-								importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.starts"));
-								CashUtil.makeFadeOutAnimation(Integer.MAX_VALUE-1, importStatusInfo);
-								try {
-									productRepository.save(products);
-									importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.successfully"));
-									CashUtil.makeFadeOutAnimation(5000, importStatusInfo);
-								} catch (Exception e) {
-									log.error("Error while saving products into database", e);
-									importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.error"));
-									importStatusInfo.setStyle("-fx-text-fill: #FF241C;");
-									CashUtil.makeFadeOutAnimation(5000, importStatusInfo);
-								}
-							}
+							importProducts(products);
 						}
+					} else {
+						importProducts(products);
 					}
 				}
 			} catch (FileNotFoundException e) {
 				log.error("Error finding file : {}", file.getAbsoluteFile());
 			} catch (IOException e) {
 				log.error("Error reading file {}", file.getAbsoluteFile());
+			} catch (Exception e) {
+				log.error("some other error happened while processing import", e);
 			} finally {
 				try {
 					if (workbook != null) {
@@ -309,6 +303,24 @@ public class ConfigController extends SimpleController {
 				} catch (IOException e) {
 					log.error("Error close input stream");
 				}
+			}
+		}
+	}
+
+	private void importProducts(Set<Product> products) {
+		if (products != null) {
+			importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.starts"));
+			CashUtil.makeFadeOutAnimation(9000, importStatusInfo);
+			try {
+				productRepository.save(products);
+				configService.updateShortcutPrices(products);
+				importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.successfully"));
+				CashUtil.makeFadeOutAnimation(5000, importStatusInfo);
+			} catch (Exception e) {
+				log.error("Error while saving products into database", e);
+				importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.error"));
+				importStatusInfo.setStyle("-fx-text-fill: #FF241C;");
+				CashUtil.makeFadeOutAnimation(5000, importStatusInfo);
 			}
 		}
 	}

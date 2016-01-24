@@ -2,6 +2,7 @@ package com.surpassun.cash.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import javax.validation.constraints.Size;
  * Products
  */
 @Entity
-@Table(name = "T_PRODUCT")
+@Table(name = "PRODUCT")
 public class Product extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -31,6 +32,7 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 	private String name;
 
 	@NotNull
+	@Column(unique = true)
 	private String code;
 
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -116,5 +118,26 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		Product product = (Product)obj;
+		if (product.getCode() == null) {
+			return false;
+		}
+		if (this.getCode().equals(product.getCode())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.getCode().hashCode();
 	}
 }

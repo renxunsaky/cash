@@ -595,30 +595,38 @@ public class CheckoutController extends SimpleController {
 	private void initializeShortcutButtons(String categoryCode) {
 		String[] products = configService.findListByName(Constants.SHORTCUT_PRODUCTS + StringPool.COLON + categoryCode);
 
-		if (products != null && products.length > 0) {
-			List<Node> productButtons = productGrid.getChildren();
-			int counter = 0;
-			for (Node productButton : productButtons) {
-				Button button = (Button) productButton;
-				if (products.length > counter) {
-					Product product = productService.getProductByBarcode(products[counter]);
-					if (product != null) {
-						button.setText(product.getName());
-						button.setId(product.getCode());
-						button.getStyleClass().removeAll(Constants.CLICKED);
-					}
-
-					// set the first button to default one
-					if (counter == 0) {
-						button.getStyleClass().add(Constants.CLICKED);
-						currentProduct.put(product.getCode(), product.getName());
-					}
+		List<Node> productButtons = productGrid.getChildren();
+		int counter = 0;
+		for (Node productButton : productButtons) {
+			Button button = (Button) productButton;
+			if (products != null && products.length > counter) {
+				Product product = productService.getProductByBarcode(products[counter]);
+				if (product != null) {
+					button.setText(product.getName());
+					button.setId(product.getCode());
+					button.getStyleClass().removeAll(Constants.CLICKED);
+				} else {
+					clearButton(button);
 				}
-				counter++;
-			}// end for
 
-			initializePriceButtons(products[0]);
-		}
+				// set the first button to default one
+				if (counter == 0) {
+					button.getStyleClass().add(Constants.CLICKED);
+					currentProduct.put(product.getCode(), product.getName());
+				}
+			} else {
+				clearButton(button);
+			}
+			counter++;
+		}// end for
+
+		initializePriceButtons(products != null ? products[0] : null);
+	}
+	
+	private void clearButton(Button button) {
+		button.setText("");
+		button.setId("");
+		button.getStyleClass().removeAll(Constants.CLICKED);
 	}
 
 	private void initializePriceButtons(String productCode) {
@@ -627,7 +635,8 @@ public class CheckoutController extends SimpleController {
 		int counter = 0;
 		for (Node priceButton : priceButtons) {
 			Button button = (Button) priceButton;
-			if (prices.length > counter) {
+			clearButton(button);
+			if (prices != null && prices.length > counter) {
 				button.setText(prices[counter]);
 			}
 			counter++;
@@ -639,7 +648,7 @@ public class CheckoutController extends SimpleController {
 		if (!paymentInProcess) {
 			Button priceButton = (Button) event.getSource();
 			String categoryCode = currentCategory.keySet().iterator().next();
-			String barcode = categoryCode + StringPool.COLON + priceButton.getText();
+			String barcode = currentProduct.keySet().iterator().next();
 
 			Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
 			addProduct(barcode, product);

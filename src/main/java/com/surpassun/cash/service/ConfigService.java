@@ -1,5 +1,11 @@
 package com.surpassun.cash.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
@@ -7,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.surpassun.cash.config.Constants;
 import com.surpassun.cash.domain.Config;
+import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.repository.ConfigRepository;
 import com.surpassun.cash.util.StringPool;
 
@@ -75,5 +83,38 @@ public class ConfigService {
 			log.warn("No config found with the name {}", name);
 		}
 		return results;
+	}
+	
+	public void updateShortcutPrices(Set<Product> products) {
+		//update shortcut prices for products
+		Map<String, List<String>> categories = new HashMap<String, List<String>>();
+		String shortcutPrices = "5.99;7.99;9.99;14.99;17.99;19.99;24.99;29.99";
+		for (Product product : products) {
+			if (categories.containsKey(product.getCategory().getCode())) {
+				categories.get(product.getCategory().getCode()).add(product.getCode());
+			} else {
+				List<String> productCodes = new ArrayList<String>();
+				productCodes.add(product.getCode());
+				categories.put(product.getCategory().getCode(), productCodes);
+			}
+			
+			Config conf = new Config(Constants.SHORTCUT_PRICES + StringPool.COLON + product.getCode(), shortcutPrices, null);
+			configRepository.save(conf);
+		}
+		
+		//update categories with products
+		for (String categoryCode : categories.keySet()) {
+			List<String> productCodes = categories.get(categoryCode);
+			String configValue = StringUtils.join(productCodes, StringPool.SEMICOLON);
+			Config conf = new Config(Constants.SHORTCUT_PRODUCTS + StringPool.COLON + categoryCode, configValue, null);
+			Config confExisted = configRepository.findByName(conf.getName());
+			if (confExisted != null) {
+				confExisted.setValue(confExisted.getValue() + StringPool.SEMICOLON + conf.getValue());
+				configRepository.save(confExisted);
+			} else {
+				configRepository.save(conf);
+			}
+		}
+		
 	}
 }

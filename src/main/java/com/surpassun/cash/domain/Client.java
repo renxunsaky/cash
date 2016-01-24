@@ -20,7 +20,7 @@ import org.joda.time.DateTime;
  * A client.
  */
 @Entity
-@Table(name = "T_CLIENT")
+@Table(name = "CLIENT")
 public class Client extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

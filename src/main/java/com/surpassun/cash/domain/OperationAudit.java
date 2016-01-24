@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
  * Audit.
  */
 @Entity
-@Table(name = "T_OPERATION_AUDIT")
+@Table(name = "OPERATION_AUDIT")
 public class OperationAudit extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
