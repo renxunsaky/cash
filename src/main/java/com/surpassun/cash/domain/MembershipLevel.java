@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "MemebershipLevel")
+@Table(name = "T_MemebershipLevel")
 public class MembershipLevel implements Serializable {
 
 	private static final long serialVersionUID = 1L;

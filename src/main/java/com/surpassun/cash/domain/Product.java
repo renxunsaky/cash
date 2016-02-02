@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
  * Products
  */
 @Entity
-@Table(name = "PRODUCT")
+@Table(name = "T_PRODUCT")
 public class Product extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

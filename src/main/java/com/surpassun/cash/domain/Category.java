@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
  * Category of products.
  */
 @Entity
-@Table(name = "CATEGORY")
+@Table(name = "T_CATEGORY")
 public class Category implements Serializable {
 
 	private static final long serialVersionUID = 1L;

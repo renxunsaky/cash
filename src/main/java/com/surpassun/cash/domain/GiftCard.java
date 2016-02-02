@@ -14,7 +14,7 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 @Entity
-@Table(name = "GIFTCARD")
+@Table(name = "T_GIFTCARD")
 public class GiftCard implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

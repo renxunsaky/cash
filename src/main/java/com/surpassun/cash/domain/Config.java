@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
  * diverse configurations
  */
 @Entity
-@Table(name = "CONFIG")
+@Table(name = "T_CONFIG")
 public class Config implements Serializable {
 
 	private static final long serialVersionUID = 1L;

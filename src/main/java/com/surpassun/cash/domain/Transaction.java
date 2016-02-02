@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  * Transaction of every payment
  */
 @Entity
-@Table(name = "TRANSACTION")
+@Table(name = "T_TRANSACTION")
 public class Transaction extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
