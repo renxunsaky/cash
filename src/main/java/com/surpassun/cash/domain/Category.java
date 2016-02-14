@@ -28,6 +28,8 @@ public class Category implements Serializable {
     private String code;
 
     private Float discount;
+    
+    private boolean shortcutButtonEnabled;
 
 	public String getName() {
 		return name;
@@ -51,6 +53,14 @@ public class Category implements Serializable {
 
 	public void setDiscount(Float discount) {
 		this.discount = discount;
+	}
+
+	public boolean isShortcutButtonEnabled() {
+		return shortcutButtonEnabled;
+	}
+
+	public void setShortcutButtonEnabled(boolean shortcutButtonEnabled) {
+		this.shortcutButtonEnabled = shortcutButtonEnabled;
 	}
     
 }

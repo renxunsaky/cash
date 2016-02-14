@@ -30,3 +30,11 @@
 				-fx-font-weight: bold;
 				-fx-font-size: 14px;
 			}
+		
+	.configMain TabPane .tabs #shortcutPricePane {
+	}
+	
+		.configMain TabPane .tabs #shortcutPricePane ListView {
+			-fx-font-weight: bold;
+			-fx-text-transform: capitalize;
+		}

@@ -45,6 +45,8 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 	private Float discount;
 
 	private Integer quantity;
+	
+	private boolean shortcutButtonEnabled;
 
 	public Product() {
 	}
@@ -56,11 +58,12 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 		this.id = -1;
 	}
 
-	public Product(String name, String barcode, float price, Category category) {
+	public Product(String name, String barcode, float price, Category category, boolean shortcutButtonEnabled) {
 		this.name = name;
 		this.code = barcode;
 		this.price = price;
 		this.category = category;
+		this.shortcutButtonEnabled = shortcutButtonEnabled;
 		super.setCreatedBy("1");
 	}
 
@@ -120,6 +123,14 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 		this.quantity = quantity;
 	}
 	
+	public boolean isShortcutButtonEnabled() {
+		return shortcutButtonEnabled;
+	}
+
+	public void setShortcutButtonEnabled(boolean shortcutButtonEnabled) {
+		this.shortcutButtonEnabled = shortcutButtonEnabled;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {

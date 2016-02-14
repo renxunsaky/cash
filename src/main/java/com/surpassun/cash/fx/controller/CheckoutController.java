@@ -29,6 +29,7 @@ import javafx.util.Duration;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -185,7 +186,7 @@ public class CheckoutController extends SimpleController {
 
 		// initialize shortcut buttons
 		List<Node> children = categoryGrid.getChildren();
-		List<Category> categories = categoryRepository.findAll();
+		List<Category> categories = categoryRepository.findByShortcutButtonEnabled(true);
 		for (int i = 0; i < categories.size(); i++) {
 			Category category = categories.get(i);
 			if (children.size() > i) {
@@ -601,10 +602,11 @@ public class CheckoutController extends SimpleController {
 			Button button = (Button) productButton;
 			if (products != null && products.length > counter) {
 				Product product = productService.getProductByBarcode(products[counter]);
-				if (product != null) {
+				if (product != null && product.isShortcutButtonEnabled()) {
 					button.setText(product.getName());
 					button.setId(product.getCode());
 					button.getStyleClass().removeAll(Constants.CLICKED);
+					counter++;
 				} else {
 					clearButton(button);
 				}
@@ -617,7 +619,6 @@ public class CheckoutController extends SimpleController {
 			} else {
 				clearButton(button);
 			}
-			counter++;
 		}// end for
 
 		initializePriceButtons(products != null ? products[0] : null);
@@ -637,7 +638,9 @@ public class CheckoutController extends SimpleController {
 			Button button = (Button) priceButton;
 			clearButton(button);
 			if (prices != null && prices.length > counter) {
-				button.setText(prices[counter]);
+				if (StringUtils.isNotBlank(prices[counter])) {
+					button.setText(prices[counter]);
+				}
 			}
 			counter++;
 		}// end for
@@ -647,11 +650,13 @@ public class CheckoutController extends SimpleController {
 	public void addProductManually(ActionEvent event) {
 		if (!paymentInProcess) {
 			Button priceButton = (Button) event.getSource();
-			String categoryCode = currentCategory.keySet().iterator().next();
-			String barcode = currentProduct.keySet().iterator().next();
-
-			Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
-			addProduct(barcode, product);
+			if (StringUtils.isNotBlank(priceButton.getText()) && NumberUtils.isNumber(priceButton.getText())) {
+				String categoryCode = currentCategory.keySet().iterator().next();
+				String barcode = currentProduct.keySet().iterator().next();
+				
+				Product product = new Product(currentCategory.get(categoryCode), barcode, priceButton.getText());
+				addProduct(barcode, product);
+			}
 		}
 	}
 
