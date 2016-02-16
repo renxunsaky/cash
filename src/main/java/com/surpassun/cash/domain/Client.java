@@ -2,6 +2,7 @@ package com.surpassun.cash.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -32,11 +33,12 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 
 	@NotNull
 	@Size(min = 6, max = 15)
+	@Column(unique = true)
 	private String code;
 	
     private String firstname;
     private String lastname;
-    private String adress;
+    private String address;
     private String postcode;
     private String city;
     private String phone;
@@ -61,6 +63,20 @@ public class Client extends AbstractAuditingEntity implements Serializable {
     
     @NotNull
     private Boolean activated = true;
+    
+	public Client(String code, String firstname, String lastname, String address, String postcode, String city, String phone, String email, DateTime birthday) {
+		super();
+		this.code = code;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.address = address;
+		this.postcode = postcode;
+		this.city = city;
+		this.phone = phone;
+		this.email = email;
+		this.birthday = birthday;
+		super.setCreatedBy("1");
+	}
 
 	public long getId() {
 		return id;
@@ -94,12 +110,12 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 		this.lastname = lastname;
 	}
 
-	public String getAdress() {
-		return adress;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setAdress(String adress) {
-		this.adress = adress;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getPostcode() {
@@ -189,4 +205,25 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	public void setActivated(Boolean activated) {
 		this.activated = activated;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		Client client = (Client)obj;
+		if (client.getCode() == null) {
+			return false;
+		}
+		if (this.getCode().equals(client.getCode())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.getCode().hashCode();
+	};
 }

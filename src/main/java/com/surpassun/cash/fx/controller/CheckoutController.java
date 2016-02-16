@@ -308,7 +308,7 @@ public class CheckoutController extends SimpleController {
 				Client client = clientRepository.findByCode(barcode);
 				if (client != null) {
 					StringBuilder clientInfoBuilder = new StringBuilder();
-					clientInfoBuilder.append(client.getCode()).append(", ").append(client.getFirstname()).append(" ").append(client.getLastname()).append(", ").append(client.getAdress()).append(" ")
+					clientInfoBuilder.append(client.getCode()).append(", ").append(client.getFirstname()).append(" ").append(client.getLastname()).append(", ").append(client.getAddress()).append(" ")
 							.append(client.getPostcode()).append(" ").append(client.getCity()).append(", ").append(client.getPhone()).append(", ").append(client.getMembershipLevel().getName());
 					clientInfo.setText(clientInfoBuilder.toString());
 				} else {
