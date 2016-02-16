@@ -41,10 +41,12 @@ import org.springframework.stereotype.Component;
 
 import com.surpassun.cash.config.Constants;
 import com.surpassun.cash.domain.Category;
+import com.surpassun.cash.domain.Client;
 import com.surpassun.cash.domain.Config;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.domain.User;
 import com.surpassun.cash.repository.CategoryRepository;
+import com.surpassun.cash.repository.ClientRepository;
 import com.surpassun.cash.repository.ConfigRepository;
 import com.surpassun.cash.repository.ProductRepository;
 import com.surpassun.cash.repository.UserRepository;
@@ -101,8 +103,12 @@ public class ConfigController extends SimpleController {
 	private CategoryRepository categoryRepository;
 	@Inject
 	private ProductRepository productRepository;
+	@Inject
+	private ClientRepository clientRepository;
 	@FXML
-	Label importStatusInfo;
+	Label importProductStatusInfo;
+	@FXML
+	Label importClientStatusInfo;
 
 	private User selectedUser;
 	private int selectedIndex;
@@ -415,21 +421,93 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
-
+	
 	private void importProducts(Set<Product> products) {
 		if (products != null) {
-			importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.starts"));
-			CashUtil.makeFadeOutAnimation(9000, importStatusInfo);
+			importProductStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.starts"));
+			CashUtil.makeFadeOutAnimation(9000, importProductStatusInfo);
 			try {
 				productRepository.save(products);
 				configService.updateShortcutPrices(products);
-				importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.successfully"));
-				CashUtil.makeFadeOutAnimation(5000, importStatusInfo);
+				importProductStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.successfully"));
+				CashUtil.makeFadeOutAnimation(5000, importProductStatusInfo);
 			} catch (Exception e) {
 				log.error("Error while saving products into database", e);
-				importStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.error"));
-				importStatusInfo.setStyle("-fx-text-fill: #FF241C;");
-				CashUtil.makeFadeOutAnimation(5000, importStatusInfo);
+				importProductStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.error"));
+				importProductStatusInfo.setStyle("-fx-text-fill: #FF241C;");
+				CashUtil.makeFadeOutAnimation(5000, importProductStatusInfo);
+			}
+		}
+	}
+		
+	@FXML
+	public void chooseClientImportFile(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose file to import");
+		File file = fileChooser.showOpenDialog(((Button) event.getSource()).getScene().getWindow());
+		if (file != null) {
+			log.info("file name {}", file.getAbsolutePath());
+			InputStream is = null;
+			HSSFWorkbook workbook = null;
+			try {
+				is = new FileInputStream(file);
+				workbook = new HSSFWorkbook(is);
+				if (workbook != null) {
+					HSSFSheet sheet = workbook.getSheetAt(0);
+					List<Integer> errorLines = new ArrayList<Integer>();
+					Set<Client> clients = ExcelImportUtil.workbookToClients(sheet, errorLines);
+					if (errorLines.size() > 0) {
+						StringBuilder sb = new StringBuilder();
+						for (Integer errorLineNumber : errorLines) {
+							sb.append(errorLineNumber).append(StringPool.COMMA_AND_SPACE);
+						}
+						boolean confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
+								LanguageUtil.getMessage("ui.popup.import.header"), LanguageUtil.getMessage("ui.popup.import.content", sb.toString()));
+						if (confirm) {
+							importClients(clients);
+						}
+					} else {
+						importClients(clients);
+					}
+				}
+			} catch (FileNotFoundException e) {
+				log.error("Error finding file : {}", file.getAbsoluteFile());
+			} catch (IOException e) {
+				log.error("Error reading file {}", file.getAbsoluteFile());
+			} catch (Exception e) {
+				log.error("some other error happened while processing import", e);
+			} finally {
+				try {
+					if (workbook != null) {
+						workbook.close();
+					}
+				} catch (IOException e) {
+					log.error("Error close workbook");
+				}
+				try {
+					if (is != null) {
+						is.close();
+					}
+				} catch (IOException e) {
+					log.error("Error close input stream");
+				}
+			}
+		}
+	}
+
+	private void importClients(Set<Client> clients) {
+		if (clients != null) {
+			importClientStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.starts"));
+			CashUtil.makeFadeOutAnimation(9000, importClientStatusInfo);
+			try {
+				clientRepository.save(clients);
+				importClientStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.successfully"));
+				CashUtil.makeFadeOutAnimation(5000, importClientStatusInfo);
+			} catch (Exception e) {
+				log.error("Error while saving products into database", e);
+				importClientStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.ends.error"));
+				importClientStatusInfo.setStyle("-fx-text-fill: #FF241C;");
+				CashUtil.makeFadeOutAnimation(5000, importClientStatusInfo);
 			}
 		}
 	}

@@ -10,6 +10,12 @@
 		-fx-background-color: #2C9BEB;
 	}
 	
+	.configMain TabPane .importPane {
+		-fx-border-width: 1px;
+		-fx-border-color: #0C5BBA;
+		-fx-border-style: solid;
+	}
+	
 	.configMain TabPane .tabs Button {
 		-fx-font-weight: bold;
 	}
