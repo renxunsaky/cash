@@ -96,6 +96,7 @@ public class ExcelImportUtil {
 			//String categoryCode = StringUtils.substring(productCode, 0, 2);
 			String categoryCode = categoryName;
 			category.setCode(categoryCode);
+			category.setShortcutButtonEnabled(true);
 			categoryRepository.save(category);
 			categories.put(categoryName, category);
 		}
@@ -113,6 +114,6 @@ public class ExcelImportUtil {
 		} else {
 			throw new Exception("File Format is valid");
 		}
-		return new Product(productName, productCode, price, categories.get(categoryName));
+		return new Product(productName, productCode, price, categories.get(categoryName), true);
 	}
 }

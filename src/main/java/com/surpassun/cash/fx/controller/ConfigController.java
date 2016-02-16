@@ -10,14 +10,18 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ListView.EditEvent;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -36,6 +40,7 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.surpassun.cash.config.Constants;
+import com.surpassun.cash.domain.Category;
 import com.surpassun.cash.domain.Config;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.domain.User;
@@ -57,6 +62,8 @@ public class ConfigController extends SimpleController {
 
 	@Inject
 	private UserRepository userRepository;
+	@FXML
+	TabPane configTabPane;
 
 	/* User configuration */
 	@FXML
@@ -99,6 +106,15 @@ public class ConfigController extends SimpleController {
 
 	private User selectedUser;
 	private int selectedIndex;
+	
+	
+	/*Shortcut prices configuration*/
+	@FXML
+	private ListView<Category> categoryList;
+	@FXML
+	private ListView<Product> productList;
+	@FXML
+	private ListView<String> priceList;
 
 	public void show(Stage stage) {
 		super.show(this, stage, Constants.FXML_DESIGN_CONFIG);
@@ -124,6 +140,65 @@ public class ConfigController extends SimpleController {
 				userActive.setSelected(selectedUser.getActivated());
 			}
 		});
+		
+		//initShortcutPane();
+	}
+	
+	@FXML
+	public void initShortcutPane() {
+		if (configTabPane.getSelectionModel().getSelectedIndex() == 2) {
+			List<Category> categories = categoryRepository.findAll();
+			
+			if (categories != null && categories.size() > 0) {
+				categoryList.getItems().addAll(categories);
+				categoryList.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
+					@Override
+					public ListCell<Category> call(ListView<Category> list) {
+						return new CategoryListCell();
+					}
+				});
+//				categoryList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Category>() {
+//					@Override
+//					public void changed(ObservableValue<? extends Category> observable, Category oldValue, Category newValue) {
+//						initProductList(newValue);
+//					}
+//				});
+				categoryList.getSelectionModel().select(0);
+				initProductList(categories.get(0));
+			}
+		}
+	}
+	
+	private void initProductList(Category category) {
+		productList.getItems().clear();
+		priceList.getItems().clear();
+		List<Product> products = productRepository.findByCategory(category);
+		if (products != null && products.size() >0) {
+			productList.getItems().addAll(products);
+			productList.setCellFactory(new Callback<ListView<Product>, ListCell<Product>>() {
+				@Override
+				public ListCell<Product> call(ListView<Product> list) {
+					return new ProductListCell();
+				}
+			});
+//			productList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Product>() {
+//				@Override
+//				public void changed(ObservableValue<? extends Product> observable, Product oldValue, Product newValue) {
+//					initPriceList( newValue.getCode());
+//				}
+//			});
+			productList.getSelectionModel().select(0);
+			initPriceList(products.get(0).getCode());
+		}
+	}
+	
+	private void initPriceList(String productCode) {
+		priceList.getItems().clear();
+		String[] prices = configService.findListByName(Constants.SHORTCUT_PRICES + StringPool.COLON + productCode);
+		String[] emptyPrices = new String[16 - prices.length];
+		priceList.getItems().addAll(prices);
+		priceList.getItems().addAll(emptyPrices);
+		priceList.setCellFactory(TextFieldListCell.forListView());
 	}
 
 	@FXML
@@ -167,6 +242,40 @@ public class ConfigController extends SimpleController {
 				setText(user.getLogin());
 				if (user.getActivated()) {
 					setStyle("-fx-text-fill: #76C525;");
+				} else {
+					setStyle("-fx-text-fill: #FF241C;");
+				}
+			} else {
+				setText(null);
+			}
+		}
+	}
+	
+	private static class CategoryListCell extends ListCell<Category> {
+		@Override
+		protected void updateItem(Category category, boolean empty) {
+			if (category != null) {
+				super.updateItem(category, empty);
+				setText(category.getName());
+				if (category.isShortcutButtonEnabled()) {
+					setStyle("-fx-text-fill: #000000;");
+				} else {
+					setStyle("-fx-text-fill: #FF241C;");
+				}
+			} else {
+				setText(null);
+			}
+		}
+	}
+	
+	private static class ProductListCell extends ListCell<Product> {
+		@Override
+		protected void updateItem(Product product, boolean empty) {
+			if (product != null) {
+				super.updateItem(product, empty);
+				setText(product.getName());
+				if (product.isShortcutButtonEnabled()) {
+					setStyle("-fx-text-fill: #000000;");
 				} else {
 					setStyle("-fx-text-fill: #FF241C;");
 				}
@@ -324,4 +433,63 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
+	
+	
+	/*********	Configure shortcut prices	********/
+	@FXML
+	public void activateCategory(ActionEvent event) {
+		int selectedIndex = categoryList.getSelectionModel().getSelectedIndex();
+		Category category = categoryList.getSelectionModel().getSelectedItem();
+		category.setShortcutButtonEnabled(!category.isShortcutButtonEnabled());
+		categoryRepository.save(category);
+		
+		categoryList.getItems().set(selectedIndex, category);
+	}
+	
+	@FXML
+	public void activateProduct(ActionEvent event) {
+		int selectedIndex = productList.getSelectionModel().getSelectedIndex();
+		Product product = productList.getSelectionModel().getSelectedItem();
+		product.setShortcutButtonEnabled(!product.isShortcutButtonEnabled());
+		productRepository.save(product);
+		
+		productList.getItems().set(selectedIndex, product);
+	}
+	
+	@FXML
+	public void updateShortcutPrice(EditEvent<String> event) {
+		if (NumberUtils.isNumber(event.getNewValue())) {
+			priceList.getItems().set(event.getIndex(), event.getNewValue());
+		}
+	}
+	
+	@FXML
+	public void refreshProductList(Event event) {
+		Category category = categoryList.getSelectionModel().getSelectedItem();
+		if (category != null) {
+			initProductList(category);
+		} else {
+			categoryList.getItems().clear();
+		}
+	}
+	
+	@FXML
+	public void refreshPriceList(Event event) {
+		Product product = productList.getSelectionModel().getSelectedItem();
+		if (product != null) {
+			initPriceList(product.getCode());
+		} else {
+			priceList.getItems().clear();
+		}
+	}
+	
+	@FXML
+	public void saveShortcutPrices(ActionEvent event) {
+		Product product = productList.getSelectionModel().getSelectedItem();
+		Config confExisted = configRepository.findByName(Constants.SHORTCUT_PRICES + StringPool.COLON + product.getCode());
+		String newValue = StringUtils.join(priceList.getItems(), StringPool.SEMICOLON);
+		confExisted.setValue(newValue);
+		configRepository.save(confExisted);
+	}
+	
 }

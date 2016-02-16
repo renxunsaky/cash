@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
  * Category of products.
  */
 @Entity
-@Table(name = "CATEGORY")
+@Table(name = "T_CATEGORY")
 public class Category implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -28,6 +28,8 @@ public class Category implements Serializable {
     private String code;
 
     private Float discount;
+    
+    private boolean shortcutButtonEnabled;
 
 	public String getName() {
 		return name;
@@ -51,6 +53,14 @@ public class Category implements Serializable {
 
 	public void setDiscount(Float discount) {
 		this.discount = discount;
+	}
+
+	public boolean isShortcutButtonEnabled() {
+		return shortcutButtonEnabled;
+	}
+
+	public void setShortcutButtonEnabled(boolean shortcutButtonEnabled) {
+		this.shortcutButtonEnabled = shortcutButtonEnabled;
 	}
     
 }

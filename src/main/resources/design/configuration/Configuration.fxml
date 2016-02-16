@@ -12,7 +12,7 @@
 
 <VBox prefHeight="800.0" prefWidth="800.0" styleClass="configMain" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.surpassun.cash.fx.controller.ConfigController">
    <children>
-      <TabPane prefHeight="800.0" prefWidth="800.0" rotateGraphic="true" tabClosingPolicy="UNAVAILABLE" tabMinHeight="80.0" tabMinWidth="50.0">
+      <TabPane fx:id="configTabPane" prefHeight="800.0" prefWidth="800.0" rotateGraphic="true" tabClosingPolicy="UNAVAILABLE" tabMinHeight="80.0" tabMinWidth="50.0">
         <tabs>
           <Tab styleClass="tabs" text="%ui.button.config.mange.user">
             <content>
@@ -75,11 +75,16 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-            <Tab styleClass="tabs" text="%ui.button.config.mange.shortcut">
+            <Tab closable="false" onSelectionChanged="#initShortcutPane" styleClass="tabs" text="%ui.button.config.mange.shortcut">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <AnchorPane id="shortcutPricePane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="169.0" layoutY="127.0" mnemonicParsing="false" text="Button tab 2" />
+                        <ListView fx:id="categoryList" layoutX="74.0" layoutY="71.0" onMouseClicked="#refreshProductList" onTouchPressed="#refreshProductList" prefHeight="488.0" prefWidth="200.0" />
+                        <ListView fx:id="productList" layoutX="312.0" layoutY="71.0" onMouseClicked="#refreshPriceList" onTouchPressed="#refreshPriceList" prefHeight="486.0" prefWidth="200.0" />
+                        <ListView fx:id="priceList" editable="true" layoutX="565.0" layoutY="71.0" onEditCommit="#updateShortcutPrice" prefHeight="486.0" prefWidth="200.0" />
+                        <Button layoutX="96.0" layoutY="585.0" mnemonicParsing="false" onAction="#activateCategory" prefHeight="27.0" prefWidth="154.0" text="%ui.button.config.label.shortcut.enable.disable" />
+                        <Button layoutX="335.0" layoutY="585.0" mnemonicParsing="false" onAction="#activateProduct" prefHeight="27.0" prefWidth="154.0" text="%ui.button.config.label.shortcut.enable.disable" />
+                        <Button layoutX="592.0" layoutY="585.0" mnemonicParsing="false" onAction="#saveShortcutPrices" text="%ui.button.config.label.shortcut.save" />
                      </children>
                   </AnchorPane>
                </content>
