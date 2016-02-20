@@ -25,41 +25,16 @@
             <Image url="@img/reporting.png" />
          </image>
       </ImageView>
-      <Label layoutX="200.0" layoutY="170.0" prefHeight="100.0" prefWidth="154.0" text="%ui.label.checkout" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="42.0" />
-         </font>
-      </Label>
-      <Text fill="WHITE" layoutX="90.0" layoutY="254.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%ui.label.sell" textAlignment="CENTER">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Text>
-      <Text fill="WHITE" layoutX="547.0" layoutY="225.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%ui.label.reporting">
-         <font>
-            <Font size="40.0" />
-         </font>
-      </Text>
       <ImageView fitHeight="160.0" fitWidth="320.0" layoutX="770.0" layoutY="140.0" onMouseClicked="#showManageClients" onTouchPressed="#showManageClients" pickOnBounds="true" preserveRatio="true" styleClass="imageView">
          <image>
             <Image url="@img/clients.png" />
          </image>
       </ImageView>
-      <Label layoutX="900.0" layoutY="170.0" prefHeight="100.0" prefWidth="178.0" text="%ui.label.manageClients" textAlignment="CENTER" textFill="WHITE" wrapText="true">
-         <font>
-            <Font size="40.0" />
-         </font>
-      </Label>
       <ImageView fitHeight="160.0" fitWidth="320.0" layoutX="70.0" layoutY="330.0" onMouseClicked="#showConfiguration" onTouchPressed="#showConfiguration" pickOnBounds="true" preserveRatio="true" styleClass="imageView">
          <image>
             <Image url="@img/configuration.png" />
          </image>
       </ImageView>
-      <Label layoutX="185.0" layoutY="392.0" text="%ui.label.configuration" textFill="WHITE">
-         <font>
-            <Font size="30.0" />
-         </font>
-      </Label>
       <ImageView fitHeight="160.0" fitWidth="320.0" layoutX="414.0" layoutY="330.0" onMouseClicked="#showManageProducts" onTouchPressed="#showManageProducts" pickOnBounds="true" preserveRatio="true" styleClass="imageView">
          <image>
             <Image url="@img/products.png" />
@@ -70,16 +45,6 @@
             <Image url="@img/transaction.png" />
          </image>
       </ImageView>
-      <Label layoutX="532.0" layoutY="360.0" prefHeight="100.0" prefWidth="185.0" text="%ui.label.manageProducts" textAlignment="CENTER" textFill="WHITE" wrapText="true">
-         <font>
-            <Font size="32.0" />
-         </font>
-      </Label>
-      <Label layoutX="897.0" layoutY="360.0" prefHeight="100.0" prefWidth="185.0" text="%ui.label.manageTransactions" textAlignment="CENTER" textFill="WHITE" wrapText="true">
-         <font>
-            <Font size="32.0" />
-         </font>
-      </Label>
       <Label layoutX="70.0" layoutY="30.0" prefHeight="75.0" prefWidth="606.0" text="%ui.label.title" textFill="WHITE">
          <font>
             <Font size="40.0" />
