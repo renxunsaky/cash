@@ -64,6 +64,9 @@ public class Client extends AbstractAuditingEntity implements Serializable {
     @NotNull
     private Boolean activated = true;
     
+    public Client() {
+    }
+    
 	public Client(String code, String firstname, String lastname, String address, String postcode, String city, String phone, String email, DateTime birthday) {
 		super();
 		this.code = code;

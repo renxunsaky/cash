@@ -52,6 +52,7 @@ import com.surpassun.cash.repository.ProductRepository;
 import com.surpassun.cash.repository.UserRepository;
 import com.surpassun.cash.service.ConfigService;
 import com.surpassun.cash.util.CashUtil;
+import com.surpassun.cash.util.ExcelExportUtil;
 import com.surpassun.cash.util.ExcelImportUtil;
 import com.surpassun.cash.util.LanguageUtil;
 import com.surpassun.cash.util.StringPool;
@@ -82,7 +83,8 @@ public class ConfigController extends SimpleController {
 	/* Discount configuration */
 	@Inject
 	private ConfigRepository configRepository;
-	@Inject ConfigService configService;
+	@Inject
+	ConfigService configService;
 	@FXML
 	CheckBox discountActive;
 	@FXML
@@ -97,7 +99,7 @@ public class ConfigController extends SimpleController {
 	Label discountValueWarnInfo;
 	@FXML
 	Label saveDiscountSuccessInfo;
-	
+
 	/* Import configuration */
 	@Inject
 	private CategoryRepository categoryRepository;
@@ -112,9 +114,8 @@ public class ConfigController extends SimpleController {
 
 	private User selectedUser;
 	private int selectedIndex;
-	
-	
-	/*Shortcut prices configuration*/
+
+	/* Shortcut prices configuration */
 	@FXML
 	private ListView<Category> categoryList;
 	@FXML
@@ -146,15 +147,15 @@ public class ConfigController extends SimpleController {
 				userActive.setSelected(selectedUser.getActivated());
 			}
 		});
-		
-		//initShortcutPane();
+
+		// initShortcutPane();
 	}
-	
+
 	@FXML
 	public void initShortcutPane() {
 		if (configTabPane.getSelectionModel().getSelectedIndex() == 2) {
 			List<Category> categories = categoryRepository.findAll();
-			
+
 			if (categories != null && categories.size() > 0) {
 				categoryList.getItems().addAll(categories);
 				categoryList.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
@@ -163,23 +164,25 @@ public class ConfigController extends SimpleController {
 						return new CategoryListCell();
 					}
 				});
-//				categoryList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Category>() {
-//					@Override
-//					public void changed(ObservableValue<? extends Category> observable, Category oldValue, Category newValue) {
-//						initProductList(newValue);
-//					}
-//				});
+				// categoryList.getSelectionModel().selectedItemProperty().addListener(new
+				// ChangeListener<Category>() {
+				// @Override
+				// public void changed(ObservableValue<? extends Category>
+				// observable, Category oldValue, Category newValue) {
+				// initProductList(newValue);
+				// }
+				// });
 				categoryList.getSelectionModel().select(0);
 				initProductList(categories.get(0));
 			}
 		}
 	}
-	
+
 	private void initProductList(Category category) {
 		productList.getItems().clear();
 		priceList.getItems().clear();
 		List<Product> products = productRepository.findByCategory(category);
-		if (products != null && products.size() >0) {
+		if (products != null && products.size() > 0) {
 			productList.getItems().addAll(products);
 			productList.setCellFactory(new Callback<ListView<Product>, ListCell<Product>>() {
 				@Override
@@ -187,17 +190,19 @@ public class ConfigController extends SimpleController {
 					return new ProductListCell();
 				}
 			});
-//			productList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Product>() {
-//				@Override
-//				public void changed(ObservableValue<? extends Product> observable, Product oldValue, Product newValue) {
-//					initPriceList( newValue.getCode());
-//				}
-//			});
+			// productList.getSelectionModel().selectedItemProperty().addListener(new
+			// ChangeListener<Product>() {
+			// @Override
+			// public void changed(ObservableValue<? extends Product>
+			// observable, Product oldValue, Product newValue) {
+			// initPriceList( newValue.getCode());
+			// }
+			// });
 			productList.getSelectionModel().select(0);
 			initPriceList(products.get(0).getCode());
 		}
 	}
-	
+
 	private void initPriceList(String productCode) {
 		priceList.getItems().clear();
 		String[] prices = configService.findListByName(Constants.SHORTCUT_PRICES + StringPool.COLON + productCode);
@@ -256,7 +261,7 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
-	
+
 	private static class CategoryListCell extends ListCell<Category> {
 		@Override
 		protected void updateItem(Category category, boolean empty) {
@@ -273,7 +278,7 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
-	
+
 	private static class ProductListCell extends ListCell<Product> {
 		@Override
 		protected void updateItem(Product product, boolean empty) {
@@ -353,7 +358,7 @@ public class ConfigController extends SimpleController {
 			configRepository.save(discountValueConfig);
 			log.info("Discount config value set to : {}", sb.toString());
 		}
-		
+
 		boolean isDiscountCouponForAll = discountCouponForAll.isSelected();
 		Config discountCouponForAllConfig = configRepository.findByName(Constants.DISCOUNT_COUPON_FOR_ALL);
 		if (discountCouponForAllConfig == null) {
@@ -370,6 +375,8 @@ public class ConfigController extends SimpleController {
 	@FXML
 	public void chooseImportFile(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel Files (*.xls)", "*.xls");
+		fileChooser.getExtensionFilters().add(extFilter);
 		fileChooser.setTitle("Choose file to import");
 		File file = fileChooser.showOpenDialog(((Button) event.getSource()).getScene().getWindow());
 		if (file != null) {
@@ -388,8 +395,8 @@ public class ConfigController extends SimpleController {
 						for (Integer errorLineNumber : errorLines) {
 							sb.append(errorLineNumber).append(StringPool.COMMA_AND_SPACE);
 						}
-						boolean confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"),
-								LanguageUtil.getMessage("ui.popup.import.header"), LanguageUtil.getMessage("ui.popup.import.content", sb.toString()));
+						boolean confirm = CashUtil.createConfirmPopup(LanguageUtil.getMessage("ui.title.common.confirmation"), LanguageUtil.getMessage("ui.popup.import.header"),
+								LanguageUtil.getMessage("ui.popup.import.content", sb.toString()));
 						if (confirm) {
 							importProducts(products);
 						}
@@ -421,7 +428,7 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
-	
+
 	private void importProducts(Set<Product> products) {
 		if (products != null) {
 			importProductStatusInfo.setText(LanguageUtil.getMessage("ui.label.info.import.starts"));
@@ -439,10 +446,12 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
-		
+
 	@FXML
 	public void chooseClientImportFile(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel Files (*.xls)", "*.xls");
+		fileChooser.getExtensionFilters().add(extFilter);
 		fileChooser.setTitle("Choose file to import");
 		File file = fileChooser.showOpenDialog(((Button) event.getSource()).getScene().getWindow());
 		if (file != null) {
@@ -511,36 +520,59 @@ public class ConfigController extends SimpleController {
 			}
 		}
 	}
+
+	@FXML
+	public void exportProductToFile(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel Files (*.xls)", "*.xls");
+		fileChooser.getExtensionFilters().add(extFilter);
+		fileChooser.setTitle("Choose file to import");
+		File file = fileChooser.showSaveDialog(((Button) event.getSource()).getScene().getWindow());
+		if(file != null){
+            ExcelExportUtil.exportProducts(productRepository, file);
+        }
+	}
 	
-	
-	/*********	Configure shortcut prices	********/
+	@FXML
+	public void exportClientToFile(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel Files (*.xls)", "*.xls");
+		fileChooser.getExtensionFilters().add(extFilter);
+		fileChooser.setTitle("Choose file to import");
+		File file = fileChooser.showSaveDialog(((Button) event.getSource()).getScene().getWindow());
+		if(file != null){
+			ExcelExportUtil.exportClients(clientRepository, file);
+		}
+	}
+
+	/********* Configure shortcut prices ********/
 	@FXML
 	public void activateCategory(ActionEvent event) {
 		int selectedIndex = categoryList.getSelectionModel().getSelectedIndex();
 		Category category = categoryList.getSelectionModel().getSelectedItem();
 		category.setShortcutButtonEnabled(!category.isShortcutButtonEnabled());
 		categoryRepository.save(category);
-		
+
 		categoryList.getItems().set(selectedIndex, category);
 	}
-	
+
 	@FXML
 	public void activateProduct(ActionEvent event) {
 		int selectedIndex = productList.getSelectionModel().getSelectedIndex();
 		Product product = productList.getSelectionModel().getSelectedItem();
 		product.setShortcutButtonEnabled(!product.isShortcutButtonEnabled());
 		productRepository.save(product);
-		
+
 		productList.getItems().set(selectedIndex, product);
 	}
-	
+
 	@FXML
 	public void updateShortcutPrice(EditEvent<String> event) {
 		if (NumberUtils.isNumber(event.getNewValue())) {
 			priceList.getItems().set(event.getIndex(), event.getNewValue());
 		}
 	}
-	
+
 	@FXML
 	public void refreshProductList(Event event) {
 		Category category = categoryList.getSelectionModel().getSelectedItem();
@@ -550,7 +582,7 @@ public class ConfigController extends SimpleController {
 			categoryList.getItems().clear();
 		}
 	}
-	
+
 	@FXML
 	public void refreshPriceList(Event event) {
 		Product product = productList.getSelectionModel().getSelectedItem();
@@ -560,7 +592,7 @@ public class ConfigController extends SimpleController {
 			priceList.getItems().clear();
 		}
 	}
-	
+
 	@FXML
 	public void saveShortcutPrices(ActionEvent event) {
 		Product product = productList.getSelectionModel().getSelectedItem();
@@ -569,5 +601,5 @@ public class ConfigController extends SimpleController {
 		confExisted.setValue(newValue);
 		configRepository.save(confExisted);
 	}
-	
+
 }

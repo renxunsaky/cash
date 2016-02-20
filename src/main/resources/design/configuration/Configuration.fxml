@@ -98,7 +98,7 @@
                               <Label alignment="CENTER" layoutX="161.0" layoutY="16.0" text="%ui.label.title.manage.products" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
                               <Label fx:id="importProductStatusInfo" alignment="CENTER" layoutX="151.0" layoutY="45.0" styleClass="successInfo" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" />
                               <Button layoutX="159.0" layoutY="80.0" mnemonicParsing="false" onAction="#chooseImportFile" prefHeight="40.0" prefWidth="295.0" styleClass="greenButton" text="%ui.button.config.import.choose.file" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
-                              <Button layoutX="156.0" layoutY="162.0" mnemonicParsing="false" onAction="#chooseImportFile" prefHeight="40.0" prefWidth="300.0" styleClass="greenButton" text="%ui.button.config.export" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
+                              <Button layoutX="156.0" layoutY="162.0" mnemonicParsing="false" onAction="#exportProductToFile" prefHeight="40.0" prefWidth="300.0" styleClass="greenButton" text="%ui.button.config.export" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
                            </children>
                         </AnchorPane>
                         <AnchorPane layoutX="60.0" layoutY="387.0" prefHeight="250.0" prefWidth="600.0" styleClass="importPane" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="60.0">
@@ -106,18 +106,9 @@
                               <Label alignment="CENTER" layoutX="161.0" layoutY="16.0" text="%ui.label.title.manage.clients" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
                               <Label fx:id="importClientStatusInfo" alignment="CENTER" layoutX="151.0" layoutY="45.0" styleClass="successInfo" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" />
                               <Button layoutX="159.0" layoutY="80.0" mnemonicParsing="false" onAction="#chooseClientImportFile" prefHeight="40.0" prefWidth="295.0" styleClass="greenButton" text="%ui.button.config.import.choose.file" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
-                              <Button layoutX="156.0" layoutY="162.0" mnemonicParsing="false" onAction="#chooseImportFile" prefHeight="40.0" prefWidth="300.0" styleClass="greenButton" text="%ui.button.config.export" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
+                              <Button layoutX="156.0" layoutY="162.0" mnemonicParsing="false" onAction="#exportClientToFile" prefHeight="40.0" prefWidth="300.0" styleClass="greenButton" text="%ui.button.config.export" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" />
                            </children>
                         </AnchorPane>
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-            <Tab styleClass="tabs" text="%ui.button.config.others">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <Button layoutX="169.0" layoutY="127.0" mnemonicParsing="false" text="Button tab 2" />
                      </children>
                   </AnchorPane>
                </content>
