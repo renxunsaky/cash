@@ -579,7 +579,7 @@ public class ConfigController extends SimpleController {
 		if (category != null) {
 			initProductList(category);
 		} else {
-			categoryList.getItems().clear();
+			productList.getItems().clear();
 		}
 	}
 

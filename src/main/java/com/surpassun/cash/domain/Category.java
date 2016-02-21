@@ -30,6 +30,15 @@ public class Category implements Serializable {
     private Float discount;
     
     private boolean shortcutButtonEnabled;
+    
+    public Category() {
+	}
+    
+    public Category(String name, String code, boolean shortcutButtonEnabled) {
+    	this.name = name;
+    	this.code = code;
+    	this.shortcutButtonEnabled = shortcutButtonEnabled;
+    }
 
 	public String getName() {
 		return name;

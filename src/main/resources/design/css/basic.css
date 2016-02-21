@@ -43,3 +43,10 @@ Label.errorInfo {
 Label.successInfo {
 	-fx-text-fill: #76C525;
 }
+
+Label.title {
+	-fx-font-size: 14px;
+	-fx-font-weight: bold;
+	-fx-text-fill: #FFFFFF;
+	-fx-background-color: #3C5B9A;
+}
