@@ -12,4 +12,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	public Product findByCode(String code);
 	
 	public List<Product> findByCategory(Category category);
+
+	public int countByCategory(Category category);
 }

@@ -23,6 +23,8 @@ import com.surpassun.cash.domain.Category;
 import com.surpassun.cash.domain.Product;
 import com.surpassun.cash.repository.CategoryRepository;
 import com.surpassun.cash.repository.ProductRepository;
+import com.surpassun.cash.util.CashUtil;
+import com.surpassun.cash.util.LanguageUtil;
 
 @Component
 public class ProductController extends SimpleController {
@@ -205,9 +207,16 @@ public class ProductController extends SimpleController {
 	public void deleteCategory() {
 		int index = categoryList.getSelectionModel().getSelectedIndex();
 		Category category = categoryList.getSelectionModel().getSelectedItem();
-		categoryList.getItems().remove(index);
-		categoryRepository.delete(category);
-		log.info("Category {} deleted", category.getName());
+		int count = productRepository.countByCategory(category);
+		if (count > 0) {
+			log.warn("{} products exist in the category {}, category will not be deleted", count, category.getName());
+			CashUtil.createWarningPopup(LanguageUtil.getMessage("ui.title.common.warning"), LanguageUtil.getMessage("ui.popup.header.product.not.null"),
+					LanguageUtil.getMessage("ui.popup.content.product.not.null"));
+		} else {
+			categoryList.getItems().remove(index);
+			categoryRepository.delete(category);
+			log.info("Category {} deleted", category.getName());
+		}
 	}
 	
 	@FXML
