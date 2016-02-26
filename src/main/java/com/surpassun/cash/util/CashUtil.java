@@ -78,4 +78,13 @@ public class CashUtil {
 		Optional<String> result = dialog.showAndWait();
 		return result.isPresent() ? result.get() : null;
 	}
+	
+	public static void createWarningPopup(String title, String headerText, String contentText) {
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.setTitle(title);
+		alert.setHeaderText(headerText);
+		alert.setContentText(contentText);
+
+		alert.show();
+	}
 }

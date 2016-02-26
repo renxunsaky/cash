@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1100.0" stylesheets="@../css/basic.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.surpassun.cash.fx.controller.ProductController">
+   <children>
+        <AnchorPane layoutX="10.0" layoutY="10.0" prefHeight="800.0" prefWidth="1100.0">
+           <children>
+            <Button mnemonicParsing="false" onAction="#showMainScreen" styleClass="orangeButton" text="%ui.button.clients.return" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+              <Label alignment="CENTER" prefHeight="30.0" prefWidth="180.0" styleClass="title" text="%ui.lable.clients.clients" textAlignment="CENTER" textFill="#f8f0f0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="30.0" />
+              <TableView fx:id="clientList" editable="true" prefHeight="600.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
+                 <columns>
+                  <TableColumn fx:id="clientFirstName" onEditCommit="#updateClient" prefWidth="100.0" text="%ui.table.header.client.firstname" />
+                  <TableColumn fx:id="clientLastName" onEditCommit="#updateClient" prefWidth="100.0" text="%ui.table.header.client.lastname" />
+                  <TableColumn fx:id="clientEmail" minWidth="0.0" onEditCommit="#updateClient" prefWidth="180.0" text="%ui.table.header.client.email" />
+                  <TableColumn fx:id="clientPhone" minWidth="0.0" onEditCommit="#updateClient" prefWidth="100.0" text="%ui.table.header.client.phone" />
+                  <TableColumn fx:id="clientAddress" minWidth="0.0" onEditCommit="#updateClient" prefWidth="220.0" text="%ui.table.header.client.address" />
+                  <TableColumn fx:id="clientPostCode" minWidth="0.0" onEditCommit="#updateClient" prefWidth="90.0" text="%ui.table.header.client.postcode" />
+                  <TableColumn fx:id="clientCity" minWidth="0.0" onEditCommit="#updateClient" prefWidth="100.0" text="%ui.table.header.client.city" />
+                  <TableColumn fx:id="clientTotalConsumation" minWidth="0.0" onEditCommit="#updateClient" prefWidth="90.0" text="%ui.table.header.client.totalConsumation" />
+                  <TableColumn fx:id="clientCode" minWidth="0.0" onEditCommit="#updateClient" prefWidth="100.0" text="%ui.table.header.client.code" />
+                 </columns>
+              </TableView>
+              <Button mnemonicParsing="false" onAction="#addClient" prefWidth="160.0" styleClass="navyButton" text="%ui.button.client.add.client" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="120.0" />
+            <Button layoutX="371.0" layoutY="723.0" mnemonicParsing="false" onAction="#deleteClient" prefWidth="160.0" styleClass="redButton" text="%ui.button.client.delete.client" AnchorPane.bottomAnchor="40.0" AnchorPane.rightAnchor="80.0" />
+           </children>
+        </AnchorPane>
+   </children>
+</HBox>

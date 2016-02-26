@@ -58,6 +58,7 @@ public class MainController extends SimpleController {
 	@FXML
 	public void showManageClients() {
 		log.debug("showManageClients clicked");
+		screenManager.showClients();
 	}
 	
 	@FXML
@@ -69,6 +70,7 @@ public class MainController extends SimpleController {
 	@FXML
 	public void showManageProducts() {
 		log.debug("showManageProducts clicked");
+		screenManager.showProducts();
 	}
 	
 	@FXML
