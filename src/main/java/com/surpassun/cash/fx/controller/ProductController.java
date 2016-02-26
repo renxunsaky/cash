@@ -76,7 +76,6 @@ public class ProductController extends SimpleController {
 		List<Category> categories = categoryRepository.findAll();
 		if (categories != null && categories.size() > 0) {
 			log.info("{} categories found", categories.size());
-			categoryList.getItems().addAll(categories);
 			/**
 			categoryList.setRowFactory(new Callback<TableView<Category>, TableRow<Category>>() {
 				@Override

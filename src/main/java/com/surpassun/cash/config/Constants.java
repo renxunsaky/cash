@@ -17,6 +17,7 @@ public interface Constants {
 	public static final String FXML_DESIGN_CHECKOUT = FXML_DESIGN_PREFIX + "checkout/Checkout" + FXML_DESIGN_SUFIX;
 	public static final String FXML_DESIGN_CONFIG = FXML_DESIGN_PREFIX + "configuration/Configuration" + FXML_DESIGN_SUFIX;
 	public static final String FXML_DESIGN_PRODUCT = FXML_DESIGN_PREFIX + "products/Products" + FXML_DESIGN_SUFIX;
+	public static final String FXML_DESIGN_CLIENT = FXML_DESIGN_PREFIX + "clients/Clients" + FXML_DESIGN_SUFIX;
 	public static final String LANG_BASE_NAME = "i18n/Language";
 	public static final String TERMINAL_ID = "TERMINAL_ID";
 	public static final String BARCODE_PREFIX_MEMBER_CARD = "88168";
@@ -34,5 +35,4 @@ public interface Constants {
 	public static final String ADMIN_PASSWORD = "ADMIN_PASSWORD";
 	public static final String OPERATION_TYPE_DECREASE_QUANTITY = "DECREASE";
 	public static final String OPERATION_TYPE_DELETE = "DELETE";
-
 }
