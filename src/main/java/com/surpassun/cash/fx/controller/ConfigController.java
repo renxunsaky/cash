@@ -9,11 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -22,7 +25,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -180,6 +186,7 @@ public class ConfigController extends SimpleController {
 
 	private void initProductList(Category category) {
 		productList.getItems().clear();
+		productList.setCellFactory(param -> new DragableCell<Product>());
 		priceList.getItems().clear();
 		List<Product> products = productRepository.findByCategory(category);
 		if (products != null && products.size() > 0) {
@@ -601,5 +608,103 @@ public class ConfigController extends SimpleController {
 		confExisted.setValue(newValue);
 		configRepository.save(confExisted);
 	}
+	
+	private class DragableCell<T> extends ListCell<T> {
+
+        public DragableCell() {
+            ListCell<T> thisCell = this;
+
+            setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            setAlignment(Pos.CENTER);
+
+            setOnDragDetected(event -> {
+                if (getItem() == null) {
+                    return;
+                }
+
+                ObservableList<T> items = getListView().getItems();
+
+                /**
+                Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putString(getItem());
+                dragboard.setDragView(
+                    birdImages.get(
+                        items.indexOf(
+                            getItem()
+                        )
+                    )
+                );
+                dragboard.setContent(content);
+                **/
+                event.consume();
+            });
+
+            setOnDragOver(event -> {
+                if (event.getGestureSource() != thisCell &&
+                       event.getDragboard().hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+
+                event.consume();
+            });
+
+            setOnDragEntered(event -> {
+                if (event.getGestureSource() != thisCell &&
+                        event.getDragboard().hasString()) {
+                    setOpacity(0.3);
+                }
+            });
+
+            setOnDragExited(event -> {
+                if (event.getGestureSource() != thisCell &&
+                        event.getDragboard().hasString()) {
+                    setOpacity(1);
+                }
+            });
+
+            setOnDragDropped(event -> {
+                if (getItem() == null) {
+                    return;
+                }
+
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+
+                if (db.hasString()) {
+                    ObservableList<T> items = getListView().getItems();
+                    int draggedIdx = items.indexOf(db.getString());
+                    int thisIdx = items.indexOf(getItem());
+
+//                    Image temp = birdImages.get(draggedIdx);
+//                    birdImages.set(draggedIdx, birdImages.get(thisIdx));
+//                    birdImages.set(thisIdx, temp);
+
+                    items.set(draggedIdx, getItem());
+                    //items.set(thisIdx, db.get);
+
+                    List<T> itemscopy = new ArrayList<>(getListView().getItems());
+                    getListView().getItems().setAll(itemscopy);
+
+                    success = true;
+                }
+                event.setDropCompleted(success);
+
+                event.consume();
+            });
+
+            setOnDragDone(DragEvent::consume);
+        }
+
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty || item == null) {
+                setGraphic(null);
+            } else {
+            }
+        }
+    }
 
 }

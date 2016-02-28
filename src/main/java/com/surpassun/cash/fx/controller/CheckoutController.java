@@ -21,7 +21,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -82,6 +85,10 @@ public class CheckoutController extends SimpleController {
 	private Float currentNumber;
 	private Float savedResult;
 	private String currentOperation;
+	private KeyCodeCombination showCalculator = new KeyCodeCombination(KeyCode.UP, KeyCombination.META_DOWN);
+	private KeyCodeCombination hideCalculator = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.META_DOWN);
+	@FXML
+	AnchorPane calculatorAnchorPane;
 
 	/******* Properties for payment method *********/
 	@FXML
@@ -298,6 +305,50 @@ public class CheckoutController extends SimpleController {
 			break;
 		}
 		calculatorResult.setText(trim(currentNumber));
+	}
+	
+	@FXML
+	public void animateCalculator(KeyEvent event) {
+		if (showCalculator.match(event)) {
+			/**
+			Animation collapsePanel = new Transition() {
+				{
+					setCycleDuration(Duration.millis(500));
+				}
+
+				@Override
+				protected void interpolate(double fraction) {
+					calculatorStackPane.setPrefWidth(480 * fraction);
+				}
+			};
+			
+			collapsePanel.setOnFinished(e -> {
+				calculatorStackPane.getChildren().forEach(node -> {node.setVisible(true);});
+				calculatorStackPane.getParent().setVisible(true);
+			});
+			collapsePanel.play();
+			**/
+			CashUtil.makeFadeInAnimation(500, calculatorAnchorPane);
+		} else if (hideCalculator.match(event)) {
+			/**
+			Animation collapsePanel = new Transition() {
+				{
+					setCycleDuration(Duration.millis(300));
+				}
+
+				@Override
+				protected void interpolate(double fraction) {
+					calculatorStackPane.setPrefWidth(480 * (1.0 - fraction));
+				}
+			};
+			collapsePanel.setOnFinished(e -> {
+				calculatorStackPane.getChildren().forEach(node -> {node.setVisible(false);});
+				calculatorStackPane.getParent().setVisible(false);
+			});
+			collapsePanel.play();
+			**/
+			CashUtil.makeFadeOutAnimation(500, calculatorAnchorPane);
+		}
 	}
 
 	@FXML
@@ -612,7 +663,7 @@ public class CheckoutController extends SimpleController {
 				}
 
 				// set the first button to default one
-				if (counter == 0) {
+				if (counter == 1) {
 					button.getStyleClass().add(Constants.CLICKED);
 					currentProduct.put(product.getCode(), product.getName());
 				}

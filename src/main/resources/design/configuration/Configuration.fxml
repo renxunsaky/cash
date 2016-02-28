@@ -113,7 +113,7 @@
                   </AnchorPane>
                </content>
             </Tab>
-            <Tab onSelectionChanged="#showMainScreen" styleClass="tabs" text="%ui.button.config.return" />
+            <Tab id="returnTab" onSelectionChanged="#showMainScreen" styleClass="tabs" text="%ui.button.config.return" />
         </tabs>
       </TabPane>
    </children>

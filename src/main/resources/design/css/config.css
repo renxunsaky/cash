@@ -6,6 +6,9 @@
 		-fx-background-color: #3C5B9A;
 		-fx-font-weight: bold;
 	}
+	.configMain TabPane .tabs#returnTab {
+		-fx-background-color: #F8B12C;
+	}
 	.configMain TabPane .tabs:selected {
 		-fx-background-color: #2C9BEB;
 	}
