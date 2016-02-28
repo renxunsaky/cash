@@ -151,4 +151,9 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 	public int hashCode() {
 		return this.getCode().hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 }

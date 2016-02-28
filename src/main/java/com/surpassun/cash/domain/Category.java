@@ -71,5 +71,10 @@ public class Category implements Serializable {
 	public void setShortcutButtonEnabled(boolean shortcutButtonEnabled) {
 		this.shortcutButtonEnabled = shortcutButtonEnabled;
 	}
+	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
     
 }
