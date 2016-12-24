@@ -84,7 +84,9 @@
                         <ListView fx:id="priceList" editable="true" layoutX="565.0" layoutY="71.0" onEditCommit="#updateShortcutPrice" prefHeight="486.0" prefWidth="200.0" />
                         <Button layoutX="96.0" layoutY="585.0" mnemonicParsing="false" onAction="#activateCategory" prefHeight="27.0" prefWidth="154.0" styleClass="navyButton" text="%ui.button.config.label.shortcut.enable.disable" />
                         <Button layoutX="335.0" layoutY="585.0" mnemonicParsing="false" onAction="#activateProduct" prefHeight="27.0" prefWidth="154.0" styleClass="blueButton" text="%ui.button.config.label.shortcut.enable.disable" />
-                        <Button layoutX="592.0" layoutY="585.0" mnemonicParsing="false" onAction="#saveShortcutPrices" styleClass="greenButton" text="%ui.button.config.label.shortcut.save" />
+                        <Button layoutX="592.0" layoutY="585.0" mnemonicParsing="false" onAction="#saveShortcutPrices" prefHeight="27.0" prefWidth="154.0" styleClass="greenButton" text="%ui.button.config.label.shortcut.save" />
+                        <Button layoutX="335.0" layoutY="636.0" mnemonicParsing="false" onAction="#saveProducts" prefHeight="27.0" prefWidth="154.0" styleClass="greenButton" text="%ui.button.config.label.shortcut.save" />
+                        <Button layoutX="96.0" layoutY="636.0" mnemonicParsing="false" onAction="#saveCategories" prefHeight="27.0" prefWidth="154.0" styleClass="greenButton" text="%ui.button.config.label.shortcut.save" />
                      </children>
                   </AnchorPane>
                </content>

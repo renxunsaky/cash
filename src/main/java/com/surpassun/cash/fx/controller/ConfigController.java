@@ -126,6 +126,8 @@ public class ConfigController extends SimpleController {
 	private ListView<Product> productList;
 	@FXML
 	private ListView<String> priceList;
+	private List<Category> modifiedCategories;
+	private List<Product> modifiedProducts;
 
 	public void show(Stage stage) {
 		super.show(this, stage, Constants.FXML_DESIGN_CONFIG);
@@ -257,40 +259,6 @@ public class ConfigController extends SimpleController {
 				setText(user.getLogin());
 				if (user.getActivated()) {
 					setStyle("-fx-text-fill: #76C525;");
-				} else {
-					setStyle("-fx-text-fill: #FF241C;");
-				}
-			} else {
-				setText(null);
-			}
-		}
-	}
-
-	private static class CategoryListCell extends ListCell<Category> {
-		@Override
-		protected void updateItem(Category category, boolean empty) {
-			if (category != null) {
-				super.updateItem(category, empty);
-				setText(category.getName());
-				if (category.isShortcutButtonEnabled()) {
-					setStyle("-fx-text-fill: #000000;");
-				} else {
-					setStyle("-fx-text-fill: #FF241C;");
-				}
-			} else {
-				setText(null);
-			}
-		}
-	}
-
-	private static class ProductListCell extends ListCell<Product> {
-		@Override
-		protected void updateItem(Product product, boolean empty) {
-			if (product != null) {
-				super.updateItem(product, empty);
-				setText(product.getName());
-				if (product.isShortcutButtonEnabled()) {
-					setStyle("-fx-text-fill: #000000;");
 				} else {
 					setStyle("-fx-text-fill: #FF241C;");
 				}
@@ -555,7 +523,9 @@ public class ConfigController extends SimpleController {
 		int selectedIndex = categoryList.getSelectionModel().getSelectedIndex();
 		Category category = categoryList.getSelectionModel().getSelectedItem();
 		category.setShortcutButtonEnabled(!category.isShortcutButtonEnabled());
-		categoryRepository.save(category);
+		
+		modifiedCategories.add(category);
+		//categoryRepository.save(category);
 
 		categoryList.getItems().set(selectedIndex, category);
 	}
@@ -565,7 +535,9 @@ public class ConfigController extends SimpleController {
 		int selectedIndex = productList.getSelectionModel().getSelectedIndex();
 		Product product = productList.getSelectionModel().getSelectedItem();
 		product.setShortcutButtonEnabled(!product.isShortcutButtonEnabled());
-		productRepository.save(product);
+		
+		modifiedProducts.add(product);
+		//productRepository.save(product);
 
 		productList.getItems().set(selectedIndex, product);
 	}
@@ -604,5 +576,32 @@ public class ConfigController extends SimpleController {
 		String newValue = StringUtils.join(priceList.getItems(), StringPool.SEMICOLON);
 		confExisted.setValue(newValue);
 		configRepository.save(confExisted);
+	}
+	
+	@FXML
+	public void saveCategories(ActionEvent event) {
+		//save configuration order
+		int totalCategories = categoryList.getItems().size();
+		List<Category> categories = new ArrayList<Category>(totalCategories);
+		//save configuration order
+		for (int i = 0; i < totalCategories; i++) {
+			Category category = categoryList.getItems().get(i);
+			category.setDisplayOrder(i);
+			categories.add(category);
+		}
+		categoryRepository.save(categories);
+	}
+	
+	@FXML
+	public void saveProducts(ActionEvent event) {
+		int totalProducts = productList.getItems().size();
+		List<Product> products = new ArrayList<Product>(totalProducts);
+		//save configuration order
+		for (int i = 0; i < totalProducts; i++) {
+			Product product = productList.getItems().get(i);
+			product.setDisplayOrder(i);
+			products.add(product);
+		}
+		productRepository.save(products);
 	}
 }

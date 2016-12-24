@@ -31,6 +31,8 @@ public class Category implements Serializable {
     
     private boolean shortcutButtonEnabled;
     
+    private int displayOrder;
+    
     public Category() {
 	}
     
@@ -72,9 +74,16 @@ public class Category implements Serializable {
 		this.shortcutButtonEnabled = shortcutButtonEnabled;
 	}
 	
+	public int getDisplayOrder() {
+		return displayOrder;
+	}
+
+	public void setDisplayOrder(int displayOrder) {
+		this.displayOrder = displayOrder;
+	}
+
 	@Override
 	public String toString() {
 		return this.getName();
 	}
-    
 }

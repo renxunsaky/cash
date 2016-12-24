@@ -1,42 +1,21 @@
 package com.surpassun.cash.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.context.ApplicationContextException;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableJpaRepositories("com.surpassun.cash.repository")
 @EnableTransactionManagement
-public class DatabaseConfiguration implements EnvironmentAware {
+public class DatabaseConfiguration {
 
-    private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
-
-    private RelaxedPropertyResolver propertyResolver;
-
-    private Environment environment;
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-        this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.datasource.");
-    }
-
+//    @Bean
+//    @ConfigurationProperties(prefix="spring.datasource")
+//    public DataSource dataSource() {
+//        return DataSourceBuilder.create().build();
+//    }
+    
+/**
     @Bean
     public DataSource dataSource() {
         log.debug("Configuring Datasource");
@@ -69,12 +48,12 @@ public class DatabaseConfiguration implements EnvironmentAware {
         }
         return new HikariDataSource(config);
     }
-
     @Bean(name = {"org.springframework.boot.autoconfigure.AutoConfigurationUtils.basePackages"})
     public List<String> getBasePackages() {
         List<String> basePackages = new ArrayList<>();
         basePackages.add("com.surpassun.cash.domain");
         return basePackages;
     }
+ **/
 }
 

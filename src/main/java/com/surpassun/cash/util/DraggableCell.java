@@ -1,5 +1,7 @@
 package com.surpassun.cash.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +15,13 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.ReflectionUtils;
+
 public class DraggableCell<T> extends ListCell<T> {
+	
+	private final Logger log = LoggerFactory.getLogger(DraggableCell.class);
 	
 	public DraggableCell(DataFormat dataFormat) {
         ListCell<T> thisCell = this;
@@ -99,6 +107,19 @@ public class DraggableCell<T> extends ListCell<T> {
 		if (obj != null) {
 			super.updateItem(obj, empty);
 			setText(obj.toString());
+			Method method = ReflectionUtils.findMethod(obj.getClass(), "isShortcutButtonEnabled");
+			if (method != null) {
+				try {
+					Boolean result = (Boolean)method.invoke(obj, null);
+					if (result) {
+						setStyle("-fx-text-fill: #000000;");
+					} else {
+						setStyle("-fx-text-fill: #FF241C;");
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					log.error("Error while invoking method 'isShortcutButtonEnabled'", e);
+				}
+			}
 		} else {
 			setText(null);
 		}

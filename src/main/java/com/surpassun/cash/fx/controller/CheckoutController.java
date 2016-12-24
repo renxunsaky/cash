@@ -328,6 +328,7 @@ public class CheckoutController extends SimpleController {
 			});
 			collapsePanel.play();
 			**/
+			calculatorAnchorPane.setVisible(true);
 			CashUtil.makeFadeInAnimation(500, calculatorAnchorPane);
 		} else if (hideCalculator.match(event)) {
 			/**
@@ -348,6 +349,7 @@ public class CheckoutController extends SimpleController {
 			collapsePanel.play();
 			**/
 			CashUtil.makeFadeOutAnimation(500, calculatorAnchorPane);
+			//calculatorAnchorPane.setVisible(false);
 		}
 	}
 

@@ -47,6 +47,8 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 	private Integer quantity;
 	
 	private boolean shortcutButtonEnabled;
+	
+	private int displayOrder;
 
 	public Product() {
 	}
@@ -129,6 +131,14 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 
 	public void setShortcutButtonEnabled(boolean shortcutButtonEnabled) {
 		this.shortcutButtonEnabled = shortcutButtonEnabled;
+	}
+
+	public int getDisplayOrder() {
+		return displayOrder;
+	}
+
+	public void setDisplayOrder(int displayOrder) {
+		this.displayOrder = displayOrder;
 	}
 
 	@Override

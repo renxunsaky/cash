@@ -1,35 +1,61 @@
+app:
+    ui:
+        title: Cash Management System
+        
+    fxmlPath:
+        login: design/Login.xml
+
 server:
     port: 8080
 
+locale:
+    language: fr
+    country: FR
+    
 spring:
     profiles: dev
 
+
     datasource:
-        dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+        url: jdbc:hsqldb:file:./hsqldb/testdb;shutdown=true
+        test-on-borrow: true
+        validation-query: select 1 from INFORMATION_SCHEMA.SYSTEM_USERS
+        username: sa
+        password: 
+        driver-class-name: org.hsqldb.jdbcDriver
+        maxWait: 10000
+        maxActive: 100
+        continueOnError: true
+        #dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
         #driverClassName: com.mysql.jdbc.Driver
+
         #jdbcUrl: jdbc:mysql://localhost:3306/cash
-        url: jdbc:mysql://localhost:3306/cash
-        databaseName:
-        serverName:
-        username: cash
-        password: cash
-        cachePrepStmts: true
-        prepStmtCacheSize: 250
-        prepStmtCacheSqlLimit: 2048
-        useServerPrepStmts: true
+        #url: jdbc:mysql://localhost:3306/cash
+        #url: jdbc:hsqldb:file:testdb
+        #databaseName:
+        #serverName:
+        #username: cash
+        #username: cash
+        #password: cash
+        #password: cash
+        # cachePrepStmts: true
+        # prepStmtCacheSize: 250
+        # prepStmtCacheSqlLimit: 2048
+        # useServerPrepStmts: true
 
     jpa:
-        database-platform: org.hibernate.dialect.MySQL5Dialect
-        #database: H2
-        database: MySQL
+        #database-platform: org.hibernate.dialect.MySQL5Dialect
+        database-platform: org.hibernate.dialect.HSQLDialect
+        #database: org.springframework.orm.jpa.vendor.Database.HSQL
+        #database: MySQL
         openInView: false
         show_sql: true
         generate-ddl: true
         hibernate:
-            ddl-auto: create-update
+            ddl-auto: update
             naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
         properties:
-            hibernate.cache.use_second_level_cache: true
+            hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: true
             hibernate.generate_statistics: true
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
