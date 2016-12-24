@@ -50,6 +50,13 @@ public class CashUtil {
 		ft.play();
 	}
 	
+	public static void makeFadeInAnimation(int duration, Node target) {
+		FadeTransition ft = new FadeTransition(Duration.millis(duration), target);
+		ft.setFromValue(0.0);
+		ft.setToValue(1.0);
+		ft.play();
+	}
+	
 	/**
 	 * create a popup dialog and wait for user's choice
 	 * 

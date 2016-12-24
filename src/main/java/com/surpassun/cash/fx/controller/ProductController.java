@@ -172,6 +172,7 @@ public class ProductController extends SimpleController {
 		} else if (columnIndex == 2) {
 			category.setDiscount((Float)newValue);
 		}
+		categoryList.getItems().set(event.getTablePosition().getRow(), category);
 		try {
 			categoryRepository.save(category);
 		} catch (Exception e) {
@@ -195,6 +196,7 @@ public class ProductController extends SimpleController {
 		} else if (columnIndex == 4) {
 			product.setDiscount((Float)newValue);
 		}
+		productList.getItems().set(event.getTablePosition().getRow(), product);
 		try {
 			productRepository.save(product);
 		} catch (Exception e) {

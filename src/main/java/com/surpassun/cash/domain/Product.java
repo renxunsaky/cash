@@ -47,6 +47,8 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 	private Integer quantity;
 	
 	private boolean shortcutButtonEnabled;
+	
+	private int displayOrder;
 
 	public Product() {
 	}
@@ -131,6 +133,14 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 		this.shortcutButtonEnabled = shortcutButtonEnabled;
 	}
 
+	public int getDisplayOrder() {
+		return displayOrder;
+	}
+
+	public void setDisplayOrder(int displayOrder) {
+		this.displayOrder = displayOrder;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -150,5 +160,10 @@ public class Product extends AbstractAuditingEntity implements Serializable {
 	@Override
 	public int hashCode() {
 		return this.getCode().hashCode();
+	}
+	
+	@Override
+	public String toString() {
+		return this.getName();
 	}
 }

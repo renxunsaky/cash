@@ -58,7 +58,7 @@ public class JavaFxApplication extends Application {
 	public void start(Stage stage) throws Exception {
 		stage.setTitle(windowTitle);
 		stage.setResizable(true);
-		//stage.setFullScreen(true);
+		stage.setFullScreen(true);
 		stage.centerOnScreen();
 		screenManager.setPrimaryStage(stage);
 		screenManager.showLogin();

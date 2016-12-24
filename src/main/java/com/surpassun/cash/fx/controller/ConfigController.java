@@ -22,6 +22,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -52,6 +53,7 @@ import com.surpassun.cash.repository.ProductRepository;
 import com.surpassun.cash.repository.UserRepository;
 import com.surpassun.cash.service.ConfigService;
 import com.surpassun.cash.util.CashUtil;
+import com.surpassun.cash.util.DraggableCell;
 import com.surpassun.cash.util.ExcelExportUtil;
 import com.surpassun.cash.util.ExcelImportUtil;
 import com.surpassun.cash.util.LanguageUtil;
@@ -62,6 +64,8 @@ public class ConfigController extends SimpleController {
 
 	private final Logger log = LoggerFactory.getLogger(ConfigController.class);
 	private static StandardPasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+	private static final DataFormat categoryFormat = new DataFormat("com.surpassun.cash.domain.Category");
+	private static final DataFormat productFormat = new DataFormat("com.surpassun.cash.domain.Product");
 
 	@Inject
 	private UserRepository userRepository;
@@ -122,6 +126,8 @@ public class ConfigController extends SimpleController {
 	private ListView<Product> productList;
 	@FXML
 	private ListView<String> priceList;
+	private List<Category> modifiedCategories;
+	private List<Product> modifiedProducts;
 
 	public void show(Stage stage) {
 		super.show(this, stage, Constants.FXML_DESIGN_CONFIG);
@@ -161,7 +167,7 @@ public class ConfigController extends SimpleController {
 				categoryList.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
 					@Override
 					public ListCell<Category> call(ListView<Category> list) {
-						return new CategoryListCell();
+						return new DraggableCell(categoryFormat);
 					}
 				});
 				// categoryList.getSelectionModel().selectedItemProperty().addListener(new
@@ -187,7 +193,7 @@ public class ConfigController extends SimpleController {
 			productList.setCellFactory(new Callback<ListView<Product>, ListCell<Product>>() {
 				@Override
 				public ListCell<Product> call(ListView<Product> list) {
-					return new ProductListCell();
+					return new DraggableCell(productFormat);
 				}
 			});
 			// productList.getSelectionModel().selectedItemProperty().addListener(new
@@ -253,40 +259,6 @@ public class ConfigController extends SimpleController {
 				setText(user.getLogin());
 				if (user.getActivated()) {
 					setStyle("-fx-text-fill: #76C525;");
-				} else {
-					setStyle("-fx-text-fill: #FF241C;");
-				}
-			} else {
-				setText(null);
-			}
-		}
-	}
-
-	private static class CategoryListCell extends ListCell<Category> {
-		@Override
-		protected void updateItem(Category category, boolean empty) {
-			if (category != null) {
-				super.updateItem(category, empty);
-				setText(category.getName());
-				if (category.isShortcutButtonEnabled()) {
-					setStyle("-fx-text-fill: #000000;");
-				} else {
-					setStyle("-fx-text-fill: #FF241C;");
-				}
-			} else {
-				setText(null);
-			}
-		}
-	}
-
-	private static class ProductListCell extends ListCell<Product> {
-		@Override
-		protected void updateItem(Product product, boolean empty) {
-			if (product != null) {
-				super.updateItem(product, empty);
-				setText(product.getName());
-				if (product.isShortcutButtonEnabled()) {
-					setStyle("-fx-text-fill: #000000;");
 				} else {
 					setStyle("-fx-text-fill: #FF241C;");
 				}
@@ -551,7 +523,9 @@ public class ConfigController extends SimpleController {
 		int selectedIndex = categoryList.getSelectionModel().getSelectedIndex();
 		Category category = categoryList.getSelectionModel().getSelectedItem();
 		category.setShortcutButtonEnabled(!category.isShortcutButtonEnabled());
-		categoryRepository.save(category);
+		
+		modifiedCategories.add(category);
+		//categoryRepository.save(category);
 
 		categoryList.getItems().set(selectedIndex, category);
 	}
@@ -561,7 +535,9 @@ public class ConfigController extends SimpleController {
 		int selectedIndex = productList.getSelectionModel().getSelectedIndex();
 		Product product = productList.getSelectionModel().getSelectedItem();
 		product.setShortcutButtonEnabled(!product.isShortcutButtonEnabled());
-		productRepository.save(product);
+		
+		modifiedProducts.add(product);
+		//productRepository.save(product);
 
 		productList.getItems().set(selectedIndex, product);
 	}
@@ -601,5 +577,31 @@ public class ConfigController extends SimpleController {
 		confExisted.setValue(newValue);
 		configRepository.save(confExisted);
 	}
-
+	
+	@FXML
+	public void saveCategories(ActionEvent event) {
+		//save configuration order
+		int totalCategories = categoryList.getItems().size();
+		List<Category> categories = new ArrayList<Category>(totalCategories);
+		//save configuration order
+		for (int i = 0; i < totalCategories; i++) {
+			Category category = categoryList.getItems().get(i);
+			category.setDisplayOrder(i);
+			categories.add(category);
+		}
+		categoryRepository.save(categories);
+	}
+	
+	@FXML
+	public void saveProducts(ActionEvent event) {
+		int totalProducts = productList.getItems().size();
+		List<Product> products = new ArrayList<Product>(totalProducts);
+		//save configuration order
+		for (int i = 0; i < totalProducts; i++) {
+			Product product = productList.getItems().get(i);
+			product.setDisplayOrder(i);
+			products.add(product);
+		}
+		productRepository.save(products);
+	}
 }
